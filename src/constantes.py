@@ -4,6 +4,8 @@ FPS = 60
 
 vitesse_joueur = 5
 
+vitesse_projectile = 10
+
 zone_morte = 0.2
 
 conf_xbox = {'A': 0,
