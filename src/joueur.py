@@ -55,6 +55,11 @@ class Joueur(pygame.sprite.Sprite):
                        (self.rect.left +80, self.rect.top +44)]
     
     def tick(self):
+        if self.cooldown > 0:
+            self.cooldown += 1
+            if self.cooldown > self.vitesse_tirs:
+                self.cooldown = 0
+            
         self.horloge_apparence += 1
         
         match self.animation:
@@ -69,7 +74,4 @@ class Joueur(pygame.sprite.Sprite):
                 if self.horloge_apparence > 40:
                     self.horloge_apparence= 0
                 
-                if self.cooldown > 0:
-                    self.cooldown += 1
-                    if self.cooldown > self.vitesse_tirs:
-                        self.cooldown = 0
+        

@@ -27,11 +27,13 @@ def gestion_controles():
             manette = pygame.joystick.Joystick(event.device_index)
             utilisation_clavier = False
             dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
+            tirer = False
             print("\nPassage en mode manette !\n")
             
         if event.type == pygame.JOYDEVICEREMOVED:   #si la manette est débranchée
             utilisation_clavier = True
             dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
+            tirer = False
             print("\nPassage en mode clavier !\n")
         
         if utilisation_clavier:     #si le joueur utilise le clavier
@@ -68,10 +70,13 @@ def gestion_controles():
                     
                     if nom == 'A':
                         tirer = True
+                        
             
             if event.type == pygame.JOYBUTTONUP:
                 if event.button == conf_bouttons['A']:
                     tirer = False
+                #if event.button == conf_bouttons['LB']: vaisseau.puissance_de_feu += 1
+                    
                     
             #gestion du joystick gauche de la manette
             if manette.get_axis(1) < - 0.2:
@@ -131,6 +136,7 @@ for i in range(1, 7):
     apparences_vaisseau.append(pygame.image.load(f"images/joueur/joueur_{i}.png").convert_alpha())
 vaisseau = Joueur(apparences_vaisseau, (SCREEN_WIDTH //2, SCREEN_HEIGHT //2), SCREEN_WIDTH, SCREEN_HEIGHT)
 
+
 #création du groupe contenant les projectiles
 balles = pygame.sprite.Group()
 
@@ -149,10 +155,10 @@ while jeu_lance:
     screen.fill((200, 200, 200))
     
     vaisseau.tick()
-    
-    balles.draw(screen)
-    screen.blit(vaisseau.image, vaisseau.coordonnees())
+        
+    screen.blit(vaisseau.image, vaisseau.rect.topleft)
 
+    balles.draw(screen)
     
     pygame.display.flip()       #mise à jour de l'affichage
             

@@ -6,6 +6,10 @@ vitesse_joueur = 5
 
 vitesse_projectile = 10
 
+vitesse_petit = 2
+
+vitesse_moyen = 5
+
 zone_morte = 0.2
 
 conf_xbox = {'A': 0,
