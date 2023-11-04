@@ -8,7 +8,7 @@ vitesse_projectile_joueur = 10
 
 vitesse_petit = 3
 
-vitesse_moyen = 2 
+vitesse_moyen = 2
 
 vitesse_projectile_moyen = 6
 

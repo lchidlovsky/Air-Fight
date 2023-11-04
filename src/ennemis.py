@@ -1,7 +1,7 @@
 import pygame
-from random import randint
 from constantes import *
 from projectile import Projectile
+from random import randint, choice
 
 class Ennemi(pygame.sprite.Sprite):
     """classe représentant un ennemi quelconque
@@ -21,9 +21,8 @@ class Ennemi(pygame.sprite.Sprite):
         self.vivant = True
         self.existant = True
         
-    def tick(self):
+    def update(self):
         self.bas(self.vitesse)
-        
         
         if not self.vivant:             #animation de destruction du vaisseau
             if self.horloge_apparence % 8 == 0:
@@ -39,7 +38,6 @@ class Ennemi(pygame.sprite.Sprite):
         self.rect.top += vitesse
 
 
-
 class Petit(Ennemi):
     """classe représentant un petit ennemi
     """
@@ -50,31 +48,29 @@ class Petit(Ennemi):
             apparences.append(pygame.image.load(f"images/ennemis/petit_{i}.png").convert_alpha())
         
         super().__init__(apparences, coord, vitesse_petit)
-        
 
 
 class Moyen(Ennemi):
     """classe représentant un ennemi de taille moyenne
     """
-    def __init__(self, coord, h_max):
+    def __init__(self, coord):
         
         apparences = []
         for i in range(1,6):
             apparences.append(pygame.image.load(f"images/ennemis/moyen_{i}.png").convert_alpha())
         
         super().__init__(apparences, coord, vitesse_moyen)
-        self.hauteur_max = h_max
         self.projectiles = pygame.sprite.Group()
-        self.vitesse_tirs = 66
+        self.vitesse_tirs = 100
         self.cooldown = 1
         
     def tirer(self):
         if self.vivant and self.cooldown == 0 and not randint(0, self.vitesse_tirs):
             self.cooldown += 1
-            return Projectile(pygame.image.load(f"images/autres/projectile_2.png").convert_alpha(), (self.rect.left +35, self.rect.top +66))
+            return Projectile(pygame.image.load(f"images/autres/projectile_2.png").convert_alpha(), (self.rect.left +35, self.rect.top +66), vitesse_projectile_moyen, 2)
 
-    def tick(self):
-        super().tick()
+    def update(self):
+        super().update()
 
         if self.cooldown > 0:       #gestion de la cadence de tir
             self.cooldown += 1
@@ -92,3 +88,70 @@ class Gros(Ennemi):
             apparences.append(pygame.image.load(f"images/ennemis/gros_{i}.png").convert_alpha())
         
         super().__init__(apparences, coord, vitesse_gros)
+
+
+class Vague:
+    """classe représentant un ensemble d'entités volantes
+    """
+    def __init__(self, nom, l_max, h_max, nb_simultanes, nb_petits, nb_moyens):
+        self.nom = nom
+        self.largeur_max = l_max
+        self.hauteur_max = h_max
+        
+        self.nb_simultanes = nb_simultanes  #nm max d'ennemis en même temps à l'écran
+        self.nb_visibles = 0
+        self.coordonnee = []
+        self.ennemis = pygame.sprite.Group()
+        self.ennemis_visibles = pygame.sprite.Group()
+        self.tirs_ennemis = pygame.sprite.Group()
+        self.bonus = pygame.sprite.Group()
+        
+        for p in range(nb_petits):
+            self.ennemis.add(Petit((0, 0)))
+            
+        for m in range(nb_moyens):
+            self.ennemis.add(Moyen((0, 0)))
+            
+        for i in range(self.nb_simultanes):
+            self.placement()
+
+    def placement(self):
+        """méthode de deplacement aléatoire des nouveaux ennemis à l'écran
+        """
+        if self.nb_visibles < self.nb_simultanes and self.ennemis:
+            self.nb_visibles += 1
+                
+            ennemi_aleatoire = choice(self.ennemis.sprites())
+            while ennemi_aleatoire in self.ennemis_visibles:
+                ennemi_aleatoire = choice(self.ennemis.sprites())
+        
+            if self.coordonnee : self.coordonnee.pop()
+            x = randint(20, self.largeur_max-80)
+            while x // 20 * 20 in self.coordonnee:
+                x = randint(20, self.largeur_max-80)
+            self.coordonnee.append(x)
+                
+            ennemi_aleatoire.rect.midbottom = (x, randint(-100, 0))
+            self.ennemis_visibles.add(ennemi_aleatoire)
+    
+           
+    def update(self):
+        self.tirs_ennemis.update()
+        self.ennemis_visibles.update()
+        self.bonus.update()
+           
+        for e in self.ennemis_visibles:
+            if e.rect.top > self.hauteur_max:
+                self.ennemis_visibles.remove(e)
+                self.nb_visibles -= 1
+                self.placement()
+            
+            if isinstance(e, Moyen):      #ajout des tirs ennemis
+                tir = e.tirer()
+                if tir:
+                    self.tirs_ennemis.add(tir)
+        
+    def draw(self, surface):
+        self.tirs_ennemis.draw(surface)
+        self.ennemis_visibles.draw(surface)
+        self.bonus.draw(surface)

@@ -49,21 +49,21 @@ class Joueur(pygame.sprite.Sprite):
             
             match self.puissance_de_feu:
                 case 1:
-                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +50, self.rect.top +5)))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +50, self.rect.top +5), vitesse_projectile_joueur, 0))
 
                 case 2:
-                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +16, self.rect.top +44)))
-                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +80, self.rect.top +44)))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +16, self.rect.top +44), vitesse_projectile_joueur, 0))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +80, self.rect.top +44), vitesse_projectile_joueur, 0))
 
                 case 3:
-                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +16, self.rect.top +44)))
-                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +50, self.rect.top +5)))
-                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +80, self.rect.top +44)))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +16, self.rect.top +44), vitesse_projectile_joueur, 0))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +50, self.rect.top +5), vitesse_projectile_joueur, 0))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +80, self.rect.top +44), vitesse_projectile_joueur, 0))
 
     
-    def tick(self):
+    def update(self):
+        self.projectiles.update()
         for p in self.projectiles:      #animation des projectiles tirés
-            p.haut(vitesse_projectile_joueur)
             if p.rect.bottom < 0:
                 self.projectiles.remove(p)
         
@@ -86,5 +86,6 @@ class Joueur(pygame.sprite.Sprite):
                 
                 if self.horloge_apparence > 40:
                     self.horloge_apparence= 0
-                
-        
+    
+    def draw(self, surface):
+        self.projectiles.draw(surface)

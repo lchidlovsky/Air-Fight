@@ -128,6 +128,10 @@ vaisseau = Joueur(apparences_vaisseau, (SCREEN_WIDTH //2, SCREEN_HEIGHT //2), SC
 dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
 tirer = False
 
+
+v = Vague("vague de test", SCREEN_WIDTH, SCREEN_HEIGHT, 5, 10, 2)
+
+
 jeu_lance = True
 while jeu_lance:
     clock.tick(FPS)
@@ -136,7 +140,11 @@ while jeu_lance:
     
     screen.fill((222, 222, 222))
     
-    vaisseau.tick()
+    vaisseau.update()
+    
+    v.update()
+    
+    v.draw(screen)
 
     vaisseau.projectiles.draw(screen)
     screen.blit(vaisseau.image, vaisseau.rect.topleft)
