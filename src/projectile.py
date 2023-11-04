@@ -1,7 +1,8 @@
 import pygame
 
 class Projectile(pygame.sprite.Sprite):
-    
+    """classe représentant un projectile
+    """
     def __init__(self, apparence, coord):
         pygame.sprite.Sprite.__init__(self)
         self.image = apparence
@@ -13,3 +14,6 @@ class Projectile(pygame.sprite.Sprite):
     
     def haut(self, vitesse):
         self.rect.top -= vitesse
+        
+    def bas(self, vitesse):
+        self.rect.top += vitesse

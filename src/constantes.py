@@ -4,11 +4,15 @@ FPS = 60
 
 vitesse_joueur = 5
 
-vitesse_projectile = 10
+vitesse_projectile_joueur = 10
 
-vitesse_petit = 2
+vitesse_petit = 3
 
-vitesse_moyen = 5
+vitesse_moyen = 2 
+
+vitesse_projectile_moyen = 6
+
+vitesse_gros = 4
 
 zone_morte = 0.2
 
