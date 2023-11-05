@@ -91,12 +91,13 @@ class Gros(Ennemi):
 
 
 class Vague:
-    """classe représentant un ensemble d'entités volantes
+    """classe représentant une vague d'entités volantes
     """
-    def __init__(self, nom, l_max, h_max, nb_simultanes, nb_petits, nb_moyens):
+    def __init__(self, nom, l_max, h_max, joueur, nb_simultanes, nb_petits, nb_moyens):
         self.nom = nom
         self.largeur_max = l_max
         self.hauteur_max = h_max
+        self.joueur = joueur
         
         self.nb_simultanes = nb_simultanes  #nm max d'ennemis en même temps à l'écran
         self.nb_visibles = 0
@@ -120,11 +121,10 @@ class Vague:
         """
         if self.nb_visibles < self.nb_simultanes and self.ennemis:
             self.nb_visibles += 1
-                
+
             ennemi_aleatoire = choice(self.ennemis.sprites())
-            while ennemi_aleatoire in self.ennemis_visibles:
-                ennemi_aleatoire = choice(self.ennemis.sprites())
-        
+            self.ennemis.remove(ennemi_aleatoire)
+            
             if self.coordonnee : self.coordonnee.pop()
             x = randint(20, self.largeur_max-80)
             while x // 20 * 20 in self.coordonnee:
@@ -141,15 +141,31 @@ class Vague:
         self.bonus.update()
            
         for e in self.ennemis_visibles:
+            
+            #replacement des ennemis arrivés en bas
             if e.rect.top > self.hauteur_max:
                 self.ennemis_visibles.remove(e)
                 self.nb_visibles -= 1
+                self.ennemis.add(e)
                 self.placement()
             
-            if isinstance(e, Moyen):      #ajout des tirs ennemis
+            #ajout des tirs ennemis
+            if isinstance(e, Moyen):
                 tir = e.tirer()
                 if tir:
                     self.tirs_ennemis.add(tir)
+                    
+            #suppression des ennemis touchés
+            for p in self.joueur.projectiles:
+                if e.vivant and p.rect.colliderect(e):
+                    self.joueur.projectiles.remove(p)
+                    e.vivant = False
+                    
+            if not e.existant:
+                self.ennemis_visibles.remove(e)
+                self.nb_visibles -= 1
+                self.placement()
+                        
         
     def draw(self, surface):
         self.tirs_ennemis.draw(surface)

@@ -10,7 +10,7 @@ def gestion_controles():
     """fonction gérant les actions du joueur
     """
     global jeu_lance
-    global vaisseau
+    global vaisseau_joueur
     global utilisation_clavier
     global manette
     global conf_bouttons
@@ -74,7 +74,7 @@ def gestion_controles():
             if event.type == pygame.JOYBUTTONUP:
                 if event.button == conf_bouttons['A']:
                     tirer = False
-                #if event.button == conf_bouttons['LB']: vaisseau.puissance_de_feu += 1
+                #if event.button == conf_bouttons['LB']: vaisseau_joueur.puissance_de_feu += 1
 
                     
             #gestion du joystick gauche de la manette
@@ -95,11 +95,11 @@ def gestion_controles():
             else:
                 dep_droit = False
                          
-    if dep_haut: vaisseau.haut(vitesse_joueur)
-    if dep_bas: vaisseau.bas(vitesse_joueur)
-    if dep_gauche: vaisseau.gauche(vitesse_joueur)
-    if dep_droit: vaisseau.droite(vitesse_joueur)
-    if tirer: vaisseau.tirer()
+    if dep_haut: vaisseau_joueur.haut(vitesse_joueur)
+    if dep_bas: vaisseau_joueur.bas(vitesse_joueur)
+    if dep_gauche: vaisseau_joueur.gauche(vitesse_joueur)
+    if dep_droit: vaisseau_joueur.droite(vitesse_joueur)
+    if tirer: vaisseau_joueur.tirer()
 
 
 
@@ -122,14 +122,14 @@ conf_bouttons = conf_xbox
 apparences_vaisseau = []
 for i in range(1, 7):
     apparences_vaisseau.append(pygame.image.load(f"images/joueur/joueur_{i}.png").convert_alpha())
-vaisseau = Joueur(apparences_vaisseau, (SCREEN_WIDTH //2, SCREEN_HEIGHT //2), SCREEN_WIDTH, SCREEN_HEIGHT)
+vaisseau_joueur = Joueur(apparences_vaisseau, (SCREEN_WIDTH //2, SCREEN_HEIGHT //2), SCREEN_WIDTH, SCREEN_HEIGHT)
 
 #variable d'action du vaisseau
 dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
 tirer = False
 
 
-v = Vague("vague de test", SCREEN_WIDTH, SCREEN_HEIGHT, 5, 10, 2)
+v = Vague("vague de test", SCREEN_WIDTH, SCREEN_HEIGHT, vaisseau_joueur, 5, nb_petits=10, nb_moyens=2)
 
 
 jeu_lance = True
@@ -140,14 +140,14 @@ while jeu_lance:
     
     screen.fill((222, 222, 222))
     
-    vaisseau.update()
+    vaisseau_joueur.update()
     
     v.update()
     
     v.draw(screen)
 
-    vaisseau.projectiles.draw(screen)
-    screen.blit(vaisseau.image, vaisseau.rect.topleft)
+    vaisseau_joueur.projectiles.draw(screen)
+    screen.blit(vaisseau_joueur.image, vaisseau_joueur.rect.topleft)
     
     pygame.display.flip()       #mise à jour de l'affichage
             
