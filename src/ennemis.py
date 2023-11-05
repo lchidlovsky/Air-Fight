@@ -68,7 +68,10 @@ class Moyen(Ennemi):
     def tirer(self):
         if self.vivant and self.cooldown == 0 and not randint(0, self.cadence_tirs):
             self.cooldown += 1
-            return Projectile(pygame.image.load(f"images/autres/projectile_2.png").convert_alpha(), (self.rect.left +35, self.rect.top +66), vitesse_projectile_moyen, 2)
+            return [Projectile(
+                pygame.image.load(f"images/autres/projectile_2.png").convert_alpha(),
+                (self.rect.left +35, self.rect.top +66), vitesse_projectile_moyen, 2)
+                    ]
 
     def update(self):
         super().update()
@@ -114,7 +117,7 @@ class Gros(Ennemi):
         self.preparation = False
         self.tir = False
         self.projectiles = pygame.sprite.Group()
-        self.cadence_tirs = 5
+        self.cadence_tirs = 2
         self.cooldown = 0
         
     def __setattr__(self, name, value):
@@ -131,8 +134,15 @@ class Gros(Ennemi):
     def tirer(self):
         if self.vivant and self.tir and self.cooldown == 0:
             self.cooldown += 1
-            return Projectile(pygame.image.load(f"images/autres/projectile_1.png").convert_alpha(), (self.rect.left +35, self.rect.top +66), vitesse_projectile_moyen, 2)
-
+            return [
+                Projectile(
+                    pygame.image.load("images/autres/laser_1.png").convert_alpha(),
+                    (self.rect.left +74, self.rect.top +175), vitesse_laser_gros, 2),
+                Projectile(
+                    pygame.image.load("images/autres/laser_2.png").convert_alpha(),
+                    (self.rect.left +90, self.rect.top +170), vitesse_laser_gros, 2)
+                ]
+            
     def update(self):
         self.bas(self.vitesse)
         #gestion du déplacement latéral
@@ -164,9 +174,8 @@ class Gros(Ennemi):
             
         else:
             
-            if not self.preparation and not self.tir and not randint(0, 500):
+            if not self.preparation and not self.tir and not randint(0, 400):
                 self.preparation = True
-                print("début de la préparation !")
                 
             #gestion de l'apparence durant la préparation
             if self.preparation:
@@ -180,6 +189,15 @@ class Gros(Ennemi):
                 if self.horloge_attaque > len(self.apparences)*20:
                     self.preparation = False
                     self.tir = True
+                    self.horloge_attaque = 0
+
+            elif self.tir:
+                self.num_apparence = 0
+                self.image = self.apparences[0]
+                self.horloge_attaque += 1
+                if self.horloge_attaque > len(self.apparences)*30:
+                    self.tir = False
+                    self.horloge_attaque = 0
             else:
                 self.num_apparence = 0
                 self.image = self.apparences[0]

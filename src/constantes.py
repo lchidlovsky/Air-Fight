@@ -16,6 +16,8 @@ vitesse_gros = 1
 
 vitesse_laterale_gros = 1
 
+vitesse_laser_gros = 20
+
 zone_morte = 0.2
 
 conf_xbox = {'A': 0,
