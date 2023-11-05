@@ -154,7 +154,11 @@ class Vague:
                 tir = e.tirer()
                 if tir:
                     self.tirs_ennemis.add(tir)
-                    
+            
+            #suppression des ennemis en contact avec le joueur
+            if e.vivant and e.rect.colliderect(self.joueur):
+                e.vivant = False
+                  
             #suppression des ennemis touchés
             for p in self.joueur.projectiles:
                 if e.vivant and p.rect.colliderect(e):
