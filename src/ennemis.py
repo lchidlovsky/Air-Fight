@@ -1,3 +1,4 @@
+from typing import Any
 import pygame
 from constantes import *
 from projectile import Projectile
@@ -20,7 +21,10 @@ class Ennemi(pygame.sprite.Sprite):
         
         self.vivant = True
         self.existant = True
-        
+    
+    def bas(self, vitesse):
+        self.rect.top += vitesse
+
     def update(self):
         self.bas(self.vitesse)
         
@@ -33,9 +37,6 @@ class Ennemi(pygame.sprite.Sprite):
                     self.existant = False
 
             self.horloge_apparence += 1
-            
-    def bas(self, vitesse):
-        self.rect.top += vitesse
 
 
 class Petit(Ennemi):
@@ -61,11 +62,11 @@ class Moyen(Ennemi):
         
         super().__init__(apparences, coord, vitesse_moyen)
         self.projectiles = pygame.sprite.Group()
-        self.vitesse_tirs = 100
+        self.cadence_tirs = 100
         self.cooldown = 1
         
     def tirer(self):
-        if self.vivant and self.cooldown == 0 and not randint(0, self.vitesse_tirs):
+        if self.vivant and self.cooldown == 0 and not randint(0, self.cadence_tirs):
             self.cooldown += 1
             return Projectile(pygame.image.load(f"images/autres/projectile_2.png").convert_alpha(), (self.rect.left +35, self.rect.top +66), vitesse_projectile_moyen, 2)
 
@@ -74,9 +75,27 @@ class Moyen(Ennemi):
 
         if self.cooldown > 0:       #gestion de la cadence de tir
             self.cooldown += 1
-            if self.cooldown > self.vitesse_tirs:
+            if self.cooldown > self.cadence_tirs:
                 self.cooldown = 0
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 class Gros(Ennemi):
     """classe représentant un gros ennemi
@@ -84,16 +103,106 @@ class Gros(Ennemi):
     def __init__(self, coord):
         
         apparences = []
-        for i in range(1,8):
+        for i in range(1,10):
             apparences.append(pygame.image.load(f"images/ennemis/gros_{i}.png").convert_alpha())
-        
+
         super().__init__(apparences, coord, vitesse_gros)
+        self.dep_gauche = False
+        self.vitesse_laterale = vitesse_laterale_gros
+        
+        self.horloge_attaque = 0
+        self.preparation = False
+        self.tir = False
+        self.projectiles = pygame.sprite.Group()
+        self.cadence_tirs = 5
+        self.cooldown = 0
+        
+    def __setattr__(self, name, value):
+        object.__setattr__(self, name, value)
+        
+        if name == 'dep_gauche':
+            self.num_apparence = 0
+            self.image = self.apparences[0]
+            self.tir = False
+            self.preparation = False
+            self.horloge_apparence = 0
+            self.horloge_attaque = 0
+        
+    def tirer(self):
+        if self.vivant and self.tir and self.cooldown == 0:
+            self.cooldown += 1
+            return Projectile(pygame.image.load(f"images/autres/projectile_1.png").convert_alpha(), (self.rect.left +35, self.rect.top +66), vitesse_projectile_moyen, 2)
+
+    def update(self):
+        self.bas(self.vitesse)
+        #gestion du déplacement latéral
+        if self.dep_gauche:
+            self.rect.left -= self.vitesse_laterale
+        else:
+            self.rect.left += self.vitesse_laterale
+        
+        #gestion de la cadence de tir
+        if self.cooldown > 0:
+            self.cooldown += 1
+            if self.cooldown > self.cadence_tirs:
+                self.cooldown = 0
+                
+        
+        #animation de destruction du vaisseau
+        if not self.vivant:
+            if self.num_apparence < 3:
+                self.num_apparence = 2
+                self.image = self.apparences[2]
+            if self.horloge_apparence % 8 == 0:
+                if self.num_apparence < len(self.apparences)-1:
+                    self.num_apparence += 1
+                    self.image = self.apparences[self.num_apparence]
+                else:
+                    self.existant = False
+
+            self.horloge_apparence += 1
+            
+        else:
+            
+            if not self.preparation and not self.tir and not randint(0, 500):
+                self.preparation = True
+                print("début de la préparation !")
+                
+            #gestion de l'apparence durant la préparation
+            if self.preparation:
+                self.horloge_attaque += 1
+                if self.horloge_attaque % 10 < 5:
+                    self.num_apparence = 1
+                    self.image = self.apparences[1]
+                else:
+                    self.num_apparence = 2
+                    self.image = self.apparences[2]
+                if self.horloge_attaque > len(self.apparences)*20:
+                    self.preparation = False
+                    self.tir = True
+            else:
+                self.num_apparence = 0
+                self.image = self.apparences[0]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class Vague:
     """classe représentant une vague d'entités volantes
     """
-    def __init__(self, nom, l_max, h_max, joueur, nb_simultanes, nb_petits, nb_moyens):
+    def __init__(self, nom, l_max, h_max, joueur, nb_simultanes, nb_petits, nb_moyens, nb_gros):
         self.nom = nom
         self.largeur_max = l_max
         self.hauteur_max = h_max
@@ -112,9 +221,13 @@ class Vague:
             
         for m in range(nb_moyens):
             self.ennemis.add(Moyen((0, 0)))
+        
+        for g in range(nb_gros):
+            self.ennemis.add(Gros((0, 0)))
             
         for i in range(self.nb_simultanes):
             self.placement()
+
 
     def placement(self):
         """méthode de deplacement aléatoire des nouveaux ennemis à l'écran
@@ -124,6 +237,9 @@ class Vague:
 
             ennemi_aleatoire = choice(self.ennemis.sprites())
             self.ennemis.remove(ennemi_aleatoire)
+            if isinstance(ennemi_aleatoire, Gros):
+                ennemi_aleatoire.preparation = False
+                ennemi_aleatoire.tir = False
             
             if self.coordonnee : self.coordonnee.pop()
             x = randint(20, self.largeur_max-80)
@@ -132,6 +248,8 @@ class Vague:
             self.coordonnee.append(x)
                 
             ennemi_aleatoire.rect.midbottom = (x, randint(-100, 0))
+            if isinstance(ennemi_aleatoire, Gros):
+                ennemi_aleatoire.dep_gauche = x > self.largeur_max // 2
             self.ennemis_visibles.add(ennemi_aleatoire)
     
            
@@ -143,14 +261,14 @@ class Vague:
         for e in self.ennemis_visibles:
             
             #replacement des ennemis arrivés en bas
-            if e.rect.top > self.hauteur_max:
+            if e.rect.top > self.hauteur_max or e.rect.left > self.largeur_max or e.rect.right < 0:
                 self.ennemis_visibles.remove(e)
                 self.nb_visibles -= 1
                 self.ennemis.add(e)
                 self.placement()
             
             #ajout des tirs ennemis
-            if isinstance(e, Moyen):
+            if not isinstance(e, Petit):
                 tir = e.tirer()
                 if tir:
                     self.tirs_ennemis.add(tir)
@@ -164,7 +282,7 @@ class Vague:
                 if e.vivant and p.rect.colliderect(e):
                     self.joueur.projectiles.remove(p)
                     e.vivant = False
-                    
+                   
             if not e.existant:
                 self.ennemis_visibles.remove(e)
                 self.nb_visibles -= 1

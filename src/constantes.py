@@ -12,7 +12,9 @@ vitesse_moyen = 2
 
 vitesse_projectile_moyen = 6
 
-vitesse_gros = 4
+vitesse_gros = 1
+
+vitesse_laterale_gros = 1
 
 zone_morte = 0.2
 

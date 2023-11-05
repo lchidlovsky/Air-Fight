@@ -21,7 +21,7 @@ class Joueur(pygame.sprite.Sprite):
         self.image_projectile = pygame.image.load(f"images/autres/projectile_1.png").convert_alpha()
         self.projectiles = pygame.sprite.Group()
         self.puissance_de_feu = 1
-        self.vitesse_tirs = 15
+        self.cadence_tirs = 15
         self.cooldown = 0
 
     def coordonnees(self):
@@ -69,7 +69,7 @@ class Joueur(pygame.sprite.Sprite):
         
         if self.cooldown > 0:       #gestion de la cadence de tir
             self.cooldown += 1
-            if self.cooldown > self.vitesse_tirs:
+            if self.cooldown > self.cadence_tirs:
                 self.cooldown = 0
         
         

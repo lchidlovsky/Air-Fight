@@ -129,7 +129,8 @@ dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
 tirer = False
 
 
-v = Vague("vague de test", SCREEN_WIDTH, SCREEN_HEIGHT, vaisseau_joueur, 5, nb_petits=10, nb_moyens=2)
+v = Vague("vague de test", SCREEN_WIDTH, SCREEN_HEIGHT, vaisseau_joueur, 5,
+          nb_petits=3, nb_moyens=2, nb_gros=1)
 
 
 jeu_lance = True
