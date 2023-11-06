@@ -36,8 +36,6 @@ class Ennemi(pygame.sprite.Sprite):
                 self.num_apparence = 1
                 self.image = self.apparences[1]
             
-            print(self.vie, "vies restantes")
-            
     
     def update(self):
         if self.vivant:
@@ -74,7 +72,7 @@ class Petit(Ennemi):
     def __init__(self, coord):
         
         apparences = []
-        for i in range(1,5):
+        for i in range(1,6):
             apparences.append(pygame.image.load(f"images/ennemis/petit_{i}.png").convert_alpha())
         
         super().__init__(apparences, coord, vie_petit, vitesse_petit)
@@ -206,7 +204,6 @@ class Gros(Ennemi):
                 
                 
             if self.est_touche:
-                print("touché !")
                 self.preparation = False
                 if self.horloge_apparence % 10 < 5:
                     self.num_apparence = 0

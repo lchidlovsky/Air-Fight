@@ -68,12 +68,9 @@ class Joueur(pygame.sprite.Sprite):
     def touche(self, degat):
         if self.animation == 1:
             self.vie -= degat
-            print("\ndégâts :", degat)
-            print("il reste", self.vie, "vies")
             self.horloge_apparence = 0
             
             if self.vie < 1 and self.animation != 3:
-                print("\nMort !\n")
                 self.animation = 3
                 self.num_apparence = 3
                 self.image = self.apparences[3]
