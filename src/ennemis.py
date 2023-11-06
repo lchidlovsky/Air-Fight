@@ -28,7 +28,8 @@ class Ennemi(pygame.sprite.Sprite):
     def update(self):
         self.bas(self.vitesse)
         
-        if not self.vivant:             #animation de destruction du vaisseau
+        #animation de destruction du vaisseau
+        if not self.vivant:
             if self.horloge_apparence % 8 == 0:
                 if self.num_apparence < len(self.apparences)-1:
                     self.num_apparence += 1
@@ -45,7 +46,7 @@ class Petit(Ennemi):
     def __init__(self, coord):
         
         apparences = []
-        for i in range(1,4):
+        for i in range(1,5):
             apparences.append(pygame.image.load(f"images/ennemis/petit_{i}.png").convert_alpha())
         
         super().__init__(apparences, coord, vitesse_petit)
@@ -57,7 +58,7 @@ class Moyen(Ennemi):
     def __init__(self, coord):
         
         apparences = []
-        for i in range(1,6):
+        for i in range(1,7):
             apparences.append(pygame.image.load(f"images/ennemis/moyen_{i}.png").convert_alpha())
         
         super().__init__(apparences, coord, vitesse_moyen)
@@ -106,7 +107,7 @@ class Gros(Ennemi):
     def __init__(self, coord):
         
         apparences = []
-        for i in range(1,10):
+        for i in range(1,11):
             apparences.append(pygame.image.load(f"images/ennemis/gros_{i}.png").convert_alpha())
 
         super().__init__(apparences, coord, vitesse_gros)
@@ -293,6 +294,7 @@ class Vague:
             
             #suppression des ennemis en contact avec le joueur
             if e.vivant and e.rect.colliderect(self.joueur):
+                self.joueur.touche(2)
                 e.vivant = False
                   
             #suppression des ennemis touchés

@@ -119,10 +119,7 @@ manette = None
 conf_bouttons = conf_xbox
 
 #création du vaisseau du joueur
-apparences_vaisseau = []
-for i in range(1, 7):
-    apparences_vaisseau.append(pygame.image.load(f"images/joueur/joueur_{i}.png").convert_alpha())
-vaisseau_joueur = Joueur(apparences_vaisseau, (SCREEN_WIDTH //2, SCREEN_HEIGHT //2), SCREEN_WIDTH, SCREEN_HEIGHT)
+vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT //2), SCREEN_WIDTH, SCREEN_HEIGHT, 9)
 
 #variable d'action du vaisseau
 dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
@@ -130,7 +127,7 @@ tirer = False
 
 
 v = Vague("vague de test", SCREEN_WIDTH, SCREEN_HEIGHT, vaisseau_joueur, 5,
-          nb_petits=3, nb_moyens=2, nb_gros=1)
+          nb_petits=30, nb_moyens=2, nb_gros=1)
 
 
 jeu_lance = True

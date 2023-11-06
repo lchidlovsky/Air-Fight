@@ -5,13 +5,17 @@ from projectile import Projectile
 class Joueur(pygame.sprite.Sprite):
     """classe représentant le vaisseau du joueur
     """
-    def __init__(self, apparences, coord, l_max, h_max):
+    def __init__(self, coord, l_max, h_max, nb_vie):
         pygame.sprite.Sprite.__init__(self)
-        self.apparences = apparences
+        self.apparences = []
+        for i in range(1,8):
+            self.apparences.append(pygame.image.load(f"images/joueur/joueur_{i}.png").convert_alpha())
+        
+        self.vie = nb_vie
         self.num_apparence = 0
         self.horloge_apparence = 0
         self.animation = 1
-        self.image = apparences[0]
+        self.image = self.apparences[0]
         self.rect = self.image.get_rect()
         self.rect.center = coord
         
@@ -60,6 +64,22 @@ class Joueur(pygame.sprite.Sprite):
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +50, self.rect.top +5), vitesse_projectile_joueur, 0))
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +80, self.rect.top +44), vitesse_projectile_joueur, 0))
 
+
+    def touche(self, degat):
+        if self.animation == 1:
+            self.vie -= degat
+            print("il reste", self.vie, "vies")
+            self.horloge_apparence = 0
+            
+            if self.vie < 1 and self.animation != 3:
+                print("\nMort !\n")
+                self.animation = 3
+                self.num_apparence = 3
+                self.image = self.apparences[3]
+            else:
+                self.animation = 2
+
+
     
     def update(self):
         self.projectiles.update()
@@ -71,21 +91,37 @@ class Joueur(pygame.sprite.Sprite):
             self.cooldown += 1
             if self.cooldown > self.cadence_tirs:
                 self.cooldown = 0
-        
-        
+
         match self.animation:
             case 1:
                 self.horloge_apparence += 1
                 
-                if self.horloge_apparence < 20:
+                if self.horloge_apparence % 40 < 20:
+                    self.num_apparence = 0
+                    self.image = self.apparences[0]
+                else:
+                    self.num_apparence = 2
+                    self.image = self.apparences[2]
+            
+            case 2:
+                self.horloge_apparence += 1
+                
+                if self.horloge_apparence % 10 < 5:
                     self.num_apparence = 0
                     self.image = self.apparences[0]
                 else:
                     self.num_apparence = 1
                     self.image = self.apparences[1]
+                if self.horloge_apparence > 100:
+                    self.animation = 1
+                    self.horloge_apparence = 0
+            
+            case 3:
+                self.horloge_apparence += 1
                 
-                if self.horloge_apparence > 40:
-                    self.horloge_apparence= 0
+                if self.horloge_apparence % 11 == 0 and self.num_apparence < len(self.apparences)-1:
+                    self.num_apparence += 1
+                    self.image = self.apparences[self.num_apparence]
     
     def draw(self, surface):
         self.projectiles.draw(surface)
