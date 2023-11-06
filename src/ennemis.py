@@ -7,29 +7,58 @@ from random import randint, choice
 class Ennemi(pygame.sprite.Sprite):
     """classe représentant un ennemi quelconque
     """
-    def __init__(self, apparences, coord, vitesse):
+    def __init__(self, apparences, coord, nb_vie, vitesse):
         pygame.sprite.Sprite.__init__(self)
         self.apparences = apparences
         self.num_apparence = 0
         self.horloge_apparence = 0
         
+        self.vie = nb_vie
         self.image = apparences[0]
         self.rect = self.image.get_rect()
         self.rect.midbottom = coord
         
         self.vitesse = vitesse
-        
+        self.est_touche = False
         self.vivant = True
         self.existant = True
     
     def bas(self, vitesse):
         self.rect.top += vitesse
-
-    def update(self):
-        self.bas(self.vitesse)
         
-        #animation de destruction du vaisseau
-        if not self.vivant:
+    def touche(self, degat):
+        if not self.est_touche:
+            self.est_touche = True
+            self.vie -= degat
+            self.horloge_apparence = 0
+            if self.vie < 1:
+                self.vie = 0
+                self.vivant = False
+                self.num_apparence = 1
+                self.image = self.apparences[1]
+            
+            print(self.vie, "vies restantes")
+            
+    
+    def update(self):
+        if self.vivant:
+            self.bas(self.vitesse)
+            
+            if self.est_touche:
+                if self.horloge_apparence % 10 < 5:
+                    self.num_apparence = 0
+                    self.image = self.apparences[0]
+                else:
+                    self.num_apparence = 1
+                    self.image = self.apparences[1]
+                if self.horloge_apparence > 100:
+                    self.animation = 1
+                    self.horloge_apparence = 0
+                    self.est_touche = False
+                    
+                self.horloge_apparence += 1
+                        
+        else:
             if self.horloge_apparence % 8 == 0:
                 if self.num_apparence < len(self.apparences)-1:
                     self.num_apparence += 1
@@ -49,7 +78,7 @@ class Petit(Ennemi):
         for i in range(1,5):
             apparences.append(pygame.image.load(f"images/ennemis/petit_{i}.png").convert_alpha())
         
-        super().__init__(apparences, coord, vitesse_petit)
+        super().__init__(apparences, coord, vie_petit, vitesse_petit)
 
 
 class Moyen(Ennemi):
@@ -61,7 +90,7 @@ class Moyen(Ennemi):
         for i in range(1,7):
             apparences.append(pygame.image.load(f"images/ennemis/moyen_{i}.png").convert_alpha())
         
-        super().__init__(apparences, coord, vitesse_moyen)
+        super().__init__(apparences, coord, vie_moyen, vitesse_moyen)
         self.projectiles = pygame.sprite.Group()
         self.cadence_tirs = 100
         self.cooldown = 1
@@ -98,7 +127,6 @@ class Moyen(Ennemi):
 
 
 
-
  
 
 class Gros(Ennemi):
@@ -110,7 +138,7 @@ class Gros(Ennemi):
         for i in range(1,11):
             apparences.append(pygame.image.load(f"images/ennemis/gros_{i}.png").convert_alpha())
 
-        super().__init__(apparences, coord, vitesse_gros)
+        super().__init__(apparences, coord, vie_gros, vitesse_gros)
         self.dep_gauche = False
         self.vitesse_laterale = vitesse_laterale_gros
         
@@ -145,20 +173,13 @@ class Gros(Ennemi):
                 ]
             
     def update(self):
-        self.bas(self.vitesse)
-        #gestion du déplacement latéral
-        if self.dep_gauche:
-            self.rect.left -= self.vitesse_laterale
-        else:
-            self.rect.left += self.vitesse_laterale
         
         #gestion de la cadence de tir
         if self.cooldown > 0:
             self.cooldown += 1
             if self.cooldown > self.cadence_tirs:
                 self.cooldown = 0
-                
-        
+
         #animation de destruction du vaisseau
         if not self.vivant:
             if self.num_apparence < 3:
@@ -174,6 +195,12 @@ class Gros(Ennemi):
             self.horloge_apparence += 1
             
         else:
+            self.bas(self.vitesse)
+            #gestion du déplacement latéral
+            if self.dep_gauche:
+                self.rect.left -= self.vitesse_laterale
+            else:
+                self.rect.left += self.vitesse_laterale
             
             if not self.preparation and not self.tir and not randint(0, 400):
                 self.preparation = True
@@ -293,16 +320,18 @@ class Vague:
                     self.tirs_ennemis.add(tir)
             
             #suppression des ennemis en contact avec le joueur
-            if e.vivant and e.rect.colliderect(self.joueur):
-                self.joueur.touche(2)
-                e.vivant = False
+            if e.vivant and not e.est_touche and self.joueur.animation == 1 and e.rect.colliderect(self.joueur):
+                self.joueur.touche(e.vie)
+                e.touche(vie_gros)
+                
                   
             #suppression des ennemis touchés
             for p in self.joueur.projectiles:
                 if e.vivant and p.rect.colliderect(e):
                     self.joueur.projectiles.remove(p)
-                    e.vivant = False
-                   
+                    e.touche(1)
+            
+            #suppression des nuages de fumée
             if not e.existant:
                 self.ennemis_visibles.remove(e)
                 self.nb_visibles -= 1

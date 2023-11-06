@@ -48,7 +48,7 @@ class Joueur(pygame.sprite.Sprite):
             self.rect.left += vitesse
     
     def tirer(self):
-        if self.cooldown == 0:
+        if self.cooldown == 0 and self.animation == 1:
             self.cooldown += 1
             
             match self.puissance_de_feu:
@@ -68,6 +68,7 @@ class Joueur(pygame.sprite.Sprite):
     def touche(self, degat):
         if self.animation == 1:
             self.vie -= degat
+            print("\ndégâts :", degat)
             print("il reste", self.vie, "vies")
             self.horloge_apparence = 0
             
