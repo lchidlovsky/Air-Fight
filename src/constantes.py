@@ -2,9 +2,21 @@ nom_du_jeu = "Air Fight"
 
 FPS = 60
 
+vie_joueur = 4
 vitesse_joueur = 5
+vitesse_projectile_joueur = 10
 
-vitesse_projectile = 10
+vie_petit = 2
+vitesse_petit = 3
+
+vie_moyen = 3
+vitesse_moyen = 2
+vitesse_projectile_moyen = 6
+
+vie_gros = 5
+vitesse_gros = 1
+vitesse_laterale_gros = 1
+vitesse_laser_gros = 20
 
 zone_morte = 0.2
 
