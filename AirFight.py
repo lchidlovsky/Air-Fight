@@ -127,7 +127,7 @@ tirer = False
 
 
 v = Vague("vague de test", SCREEN_WIDTH, SCREEN_HEIGHT, vaisseau_joueur, 5,
-          nb_petits=4, nb_moyens=1, nb_gros=0)
+          nb_petits=0, nb_moyens=0, nb_gros=1)
 
 
 jeu_lance = True

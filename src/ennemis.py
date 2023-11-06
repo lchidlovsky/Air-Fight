@@ -1,4 +1,3 @@
-from typing import Any
 import pygame
 from constantes import *
 from projectile import Projectile
@@ -182,9 +181,9 @@ class Gros(Ennemi):
 
         #animation de destruction du vaisseau
         if not self.vivant:
-            if self.num_apparence < 3:
-                self.num_apparence = 2
-                self.image = self.apparences[2]
+            if self.num_apparence < 4:
+                self.num_apparence = 3
+                self.image = self.apparences[3]
             if self.horloge_apparence % 8 == 0:
                 if self.num_apparence < len(self.apparences)-1:
                     self.num_apparence += 1
@@ -205,12 +204,29 @@ class Gros(Ennemi):
             if not self.preparation and not self.tir and not randint(0, 400):
                 self.preparation = True
                 
-            #gestion de l'apparence durant la préparation
-            if self.preparation:
-                self.horloge_attaque += 1
-                if self.horloge_attaque % 10 < 5:
+                
+            if self.est_touche:
+                print("touché !")
+                self.preparation = False
+                if self.horloge_apparence % 10 < 5:
+                    self.num_apparence = 0
+                    self.image = self.apparences[0]
+                else:
                     self.num_apparence = 1
                     self.image = self.apparences[1]
+                if self.horloge_apparence > 100:
+                    self.animation = 1
+                    self.horloge_apparence = 0
+                    self.est_touche = False
+                    
+                self.horloge_apparence += 1
+                
+            #gestion de l'apparence durant la préparation
+            elif self.preparation:
+                self.horloge_attaque += 1
+                if self.horloge_attaque % 10 < 5:
+                    self.num_apparence = 3
+                    self.image = self.apparences[3]
                 else:
                     self.num_apparence = 2
                     self.image = self.apparences[2]
