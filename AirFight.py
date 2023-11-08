@@ -118,16 +118,21 @@ utilisation_clavier = True
 manette = None
 conf_bouttons = conf_xbox
 
-#création du vaisseau du joueur
-vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT //2), SCREEN_WIDTH, SCREEN_HEIGHT, vie_joueur)
 
 #variable d'action du vaisseau
 dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
 tirer = False
 
 
-v = Vague("vague de test", SCREEN_WIDTH, SCREEN_HEIGHT, vaisseau_joueur, 5,
-          nb_petits=3, nb_moyens=1, nb_gros=1)
+#création des entités visuelles
+header = gameBar((SCREEN_WIDTH, 60))
+
+vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT * 0.8), (0, header.get_height()), (SCREEN_WIDTH, SCREEN_HEIGHT), vie_joueur)
+
+v = Vague("vague de test", coord_min=(0, header.get_height()), coord_max=(SCREEN_WIDTH, SCREEN_HEIGHT),
+          joueur=vaisseau_joueur, nb_simultanes=5, nb_petits=3, nb_moyens=1, nb_gros=1)
+
+
 
 
 jeu_lance = True
@@ -138,14 +143,17 @@ while jeu_lance:
     
     screen.fill((222, 222, 222))
     
-    vaisseau_joueur.update()
     
+    #mise à jour des entités
+    vaisseau_joueur.update()
     v.update()
     
+    #affichage des entités
     v.draw(screen)
-
     vaisseau_joueur.projectiles.draw(screen)
     screen.blit(vaisseau_joueur.image, vaisseau_joueur.rect.topleft)
+    header.draw(screen, vaisseau_joueur.vie)
+    
     
     pygame.display.flip()       #mise à jour de l'affichage
             

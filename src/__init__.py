@@ -1,4 +1,5 @@
 from constantes import *
 from joueur import *
-from projectile import  *
-from ennemis import  *
+from projectile import *
+from ennemis import *
+from gamebar import *

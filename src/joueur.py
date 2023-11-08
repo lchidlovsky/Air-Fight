@@ -5,7 +5,7 @@ from projectile import Projectile
 class Joueur(pygame.sprite.Sprite):
     """classe représentant le vaisseau du joueur
     """
-    def __init__(self, coord, l_max, h_max, nb_vie):
+    def __init__(self, coord, coord_min, coord_max, nb_vie):
         pygame.sprite.Sprite.__init__(self)
         self.apparences = []
         for i in range(1,8):
@@ -19,8 +19,10 @@ class Joueur(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = coord
         
-        self.largeur_max = l_max
-        self.hauteur_max = h_max
+        self.largeur_min = coord_min[0]
+        self.hauteur_min = coord_min[1]
+        self.largeur_max = coord_max[0]
+        self.hauteur_max = coord_max[1]
         
         self.image_projectile = pygame.image.load(f"images/autres/projectile_1.png").convert_alpha()
         self.projectiles = pygame.sprite.Group()
@@ -28,11 +30,8 @@ class Joueur(pygame.sprite.Sprite):
         self.cadence_tirs = 15
         self.cooldown = 0
 
-    def coordonnees(self):
-        return self.rect.left, self.rect.top
-
     def haut(self, vitesse):
-        if self.rect.top - vitesse >= 0:
+        if self.rect.top - vitesse >= self.hauteur_min:
             self.rect.top -= vitesse
         
     def bas(self, vitesse):
@@ -40,7 +39,7 @@ class Joueur(pygame.sprite.Sprite):
             self.rect.top += vitesse
         
     def gauche(self, vitesse):
-        if self.rect.left - vitesse >= 0:
+        if self.rect.left - vitesse >= self.largeur_min:
             self.rect.left -= vitesse
         
     def droite(self, vitesse):
@@ -71,6 +70,7 @@ class Joueur(pygame.sprite.Sprite):
             self.horloge_apparence = 0
             
             if self.vie < 1 and self.animation != 3:
+                self.vie = 0
                 self.animation = 3
                 self.num_apparence = 3
                 self.image = self.apparences[3]
@@ -80,9 +80,10 @@ class Joueur(pygame.sprite.Sprite):
 
     
     def update(self):
+        #animation des projectiles tirés
         self.projectiles.update()
-        for p in self.projectiles:      #animation des projectiles tirés
-            if p.rect.bottom < 0:
+        for p in self.projectiles:
+            if p.rect.bottom < self.hauteur_min:
                 self.projectiles.remove(p)
         
         if self.cooldown > 0:       #gestion de la cadence de tir

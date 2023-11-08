@@ -261,10 +261,12 @@ class Gros(Ennemi):
 class Vague:
     """classe représentant une vague d'entités volantes
     """
-    def __init__(self, nom, l_max, h_max, joueur, nb_simultanes, nb_petits, nb_moyens, nb_gros):
+    def __init__(self, nom, coord_min, coord_max, joueur, nb_simultanes, nb_petits, nb_moyens, nb_gros):
         self.nom = nom
-        self.largeur_max = l_max
-        self.hauteur_max = h_max
+        self.largeur_min = coord_min[0]
+        self.hauteur_min = coord_min[1]
+        self.largeur_max = coord_max[0]
+        self.hauteur_max = coord_max[1]
         self.joueur = joueur
         
         self.nb_simultanes = nb_simultanes  #nm max d'ennemis en même temps à l'écran
@@ -306,7 +308,7 @@ class Vague:
                 x = randint(20, self.largeur_max-80)
             self.coordonnee.append(x)
                 
-            ennemi_aleatoire.rect.midbottom = (x, randint(-100, 0))
+            ennemi_aleatoire.rect.midbottom = (x, randint(self.hauteur_min-111, self.hauteur_min))
             if isinstance(ennemi_aleatoire, Gros):
                 ennemi_aleatoire.dep_gauche = x > self.largeur_max // 2
             self.ennemis_visibles.add(ennemi_aleatoire)
