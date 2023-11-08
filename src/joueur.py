@@ -24,8 +24,9 @@ class Joueur(pygame.sprite.Sprite):
         self.largeur_max = coord_max[0]
         self.hauteur_max = coord_max[1]
         
-        self.image_projectile = pygame.image.load(f"images/autres/projectile_1.png").convert_alpha()
+        self.image_projectile = pygame.image.load("images/autres/projectile_1.png").convert_alpha()
         self.projectiles = pygame.sprite.Group()
+        self.chargeur = chargeur_joueur
         self.puissance_de_feu = 1
         self.cadence_tirs = 15
         self.cooldown = 0
@@ -47,8 +48,9 @@ class Joueur(pygame.sprite.Sprite):
             self.rect.left += vitesse
     
     def tirer(self):
-        if self.animation != 3 and self.cooldown == 0 and self.animation == 1:
+        if self.cooldown == 0 and self.animation == 1 and self.chargeur > 0:
             self.cooldown += 1
+            self.chargeur -= 1
             
             match self.puissance_de_feu:
                 case 1:

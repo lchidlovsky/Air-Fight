@@ -5,6 +5,9 @@ FPS = 60
 vie_joueur = 8
 vitesse_joueur = 5
 vitesse_projectile_joueur = 10
+chargeur_joueur = 30
+
+vitesse_bonus = 1
 
 vie_petit = 2
 vitesse_petit = 3

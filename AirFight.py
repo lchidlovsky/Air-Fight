@@ -16,6 +16,7 @@ def gestion_controles():
     global conf_bouttons
     global dep_haut, dep_bas, dep_gauche, dep_droit
     global tirer
+    global w
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -75,6 +76,7 @@ def gestion_controles():
                 if event.button == conf_bouttons['A']:
                     tirer = False
                 if event.button == conf_bouttons['LB']: vaisseau_joueur.puissance_de_feu += 1
+                if event.button == conf_bouttons['RB']: w = not w
 
                     
             #gestion du joystick gauche de la manette
@@ -125,15 +127,16 @@ tirer = False
 
 
 #création des entités visuelles
-header = gameBar((SCREEN_WIDTH, 60))
+vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT * 0.8), (0, 60), (SCREEN_WIDTH, SCREEN_HEIGHT), vie_joueur)
 
-vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT * 0.8), (0, header.get_height()), (SCREEN_WIDTH, SCREEN_HEIGHT), vie_joueur)
+header = gameBar((SCREEN_WIDTH, 60), vaisseau_joueur)
 
 v = Vague("vague de test", coord_min=(0, header.get_height()), coord_max=(SCREEN_WIDTH, SCREEN_HEIGHT),
-          joueur=vaisseau_joueur, nb_simultanes=5, nb_petits=3, nb_moyens=1, nb_gros=1)
+          joueur=vaisseau_joueur, nb_simultanes=5, nb_petits=3, nb_moyens=1, nb_gros=1, nb_munitions=2)
 
 
 
+w = True
 
 jeu_lance = True
 while jeu_lance:
@@ -146,13 +149,13 @@ while jeu_lance:
     
     #mise à jour des entités
     vaisseau_joueur.update()
-    v.update()
+    if w: v.update()
     
     #affichage des entités
     v.draw(screen)
     vaisseau_joueur.projectiles.draw(screen)
     screen.blit(vaisseau_joueur.image, vaisseau_joueur.rect.topleft)
-    header.draw(screen, vaisseau_joueur.vie)
+    header.draw(screen)
     
     
     pygame.display.flip()       #mise à jour de l'affichage

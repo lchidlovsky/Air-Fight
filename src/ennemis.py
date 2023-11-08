@@ -1,7 +1,9 @@
 import pygame
 from constantes import *
+from bonus import Bonus
 from projectile import Projectile
 from random import randint, choice
+
 
 class Ennemi(pygame.sprite.Sprite):
     """classe représentant un ennemi quelconque
@@ -108,23 +110,6 @@ class Moyen(Ennemi):
             if self.cooldown > self.cadence_tirs:
                 self.cooldown = 0
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
 
 class Gros(Ennemi):
     """classe représentant un gros ennemi
@@ -245,23 +230,10 @@ class Gros(Ennemi):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Vague:
     """classe représentant une vague d'entités volantes
     """
-    def __init__(self, nom, coord_min, coord_max, joueur, nb_simultanes, nb_petits, nb_moyens, nb_gros):
+    def __init__(self, nom, coord_min, coord_max, joueur, nb_simultanes, nb_petits, nb_moyens, nb_gros, nb_munitions):
         self.nom = nom
         self.largeur_min = coord_min[0]
         self.hauteur_min = coord_min[1]
@@ -275,7 +247,9 @@ class Vague:
         self.ennemis = pygame.sprite.Group()
         self.ennemis_visibles = pygame.sprite.Group()
         self.tirs_ennemis = pygame.sprite.Group()
+        
         self.bonus = pygame.sprite.Group()
+        self.bonus_visibles = pygame.sprite.Group()
         
         for p in range(nb_petits):
             self.ennemis.add(Petit((0, 0)))
@@ -286,13 +260,34 @@ class Vague:
         for g in range(nb_gros):
             self.ennemis.add(Gros((0, 0)))
             
+        for b in range(nb_munitions):
+            self.bonus.add(Bonus((0, 0), vitesse_bonus, 1))
+            
         for i in range(self.nb_simultanes):
-            self.placement()
+            self.placement_ennemi()
 
-
-    def placement(self):
-        """méthode de deplacement aléatoire des nouveaux ennemis à l'écran
+    def placement_bonus(self):
+        """méthode de placement aléatoire de bonus à l'écran
         """
+        print("\tnew bonus !!")
+        bonus_aleatoire = choice(self.bonus.sprites())
+        self.bonus.remove(bonus_aleatoire)
+        
+        if self.coordonnee : self.coordonnee.pop()
+        x = randint(20, self.largeur_max-80)
+        while x // 20 * 20 in self.coordonnee:
+            x = randint(20, self.largeur_max-80)
+        self.coordonnee.append(x)
+        
+        bonus_aleatoire.rect.midbottom = (x, self.hauteur_min)
+        self.bonus_visibles.add(bonus_aleatoire)
+
+
+    def placement_ennemi(self):
+        """méthode de placement aléatoire des nouveaux ennemis à l'écran
+        """
+        if not randint(0, 4) and self.bonus: self.placement_bonus()
+        
         if self.nb_visibles < self.nb_simultanes and self.ennemis:
             self.nb_visibles += 1
 
@@ -317,16 +312,16 @@ class Vague:
     def update(self):
         self.tirs_ennemis.update()
         self.ennemis_visibles.update()
-        self.bonus.update()
+        self.bonus_visibles.update()
            
         for e in self.ennemis_visibles:
             
             #replacement des ennemis arrivés en bas
-            if e.rect.top > self.hauteur_max or e.rect.left > self.largeur_max or e.rect.right < 0:
+            if e.rect.top > self.hauteur_max or e.rect.left > self.largeur_max or e.rect.right < self.largeur_min:
                 self.ennemis_visibles.remove(e)
                 self.nb_visibles -= 1
                 self.ennemis.add(e)
-                self.placement()
+                self.placement_ennemi()
             
             #ajout des tirs ennemis
             if not isinstance(e, Petit):
@@ -350,10 +345,20 @@ class Vague:
             if not e.existant:
                 self.ennemis_visibles.remove(e)
                 self.nb_visibles -= 1
-                self.placement()
-                        
+                self.placement_ennemi()
+        
+        for b in self.bonus_visibles:
+            
+            #replacement des ennemis arrivés en bas
+            if b.rect.top > self.hauteur_max:
+                self.bonus_visibles.remove(b)
+                self.bonus.add(b)
+                
+            if b.rect.colliderect(self.joueur):
+                self.bonus_visibles.remove(b)
+                self.joueur.chargeur += 10
         
     def draw(self, surface):
+        self.bonus_visibles.draw(surface)
         self.tirs_ennemis.draw(surface)
         self.ennemis_visibles.draw(surface)
-        self.bonus.draw(surface)
