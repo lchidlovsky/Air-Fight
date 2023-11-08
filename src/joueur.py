@@ -27,6 +27,7 @@ class Joueur(pygame.sprite.Sprite):
         self.image_projectile = pygame.image.load("images/autres/projectile_1.png").convert_alpha()
         self.projectiles = pygame.sprite.Group()
         self.chargeur = chargeur_joueur
+        self.explosifs = 0
         self.puissance_de_feu = 1
         self.cadence_tirs = 15
         self.cooldown = 0
