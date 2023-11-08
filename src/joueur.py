@@ -31,23 +31,23 @@ class Joueur(pygame.sprite.Sprite):
         self.cooldown = 0
 
     def haut(self, vitesse):
-        if self.rect.top - vitesse >= self.hauteur_min:
+        if self.animation != 3 and self.rect.top - vitesse >= self.hauteur_min:
             self.rect.top -= vitesse
         
     def bas(self, vitesse):
-        if self.rect.bottom <= self.hauteur_max:
+        if self.animation != 3 and self.rect.bottom <= self.hauteur_max:
             self.rect.top += vitesse
         
     def gauche(self, vitesse):
-        if self.rect.left - vitesse >= self.largeur_min:
+        if self.animation != 3 and self.rect.left - vitesse >= self.largeur_min:
             self.rect.left -= vitesse
         
     def droite(self, vitesse):
-        if self.rect.right <= self.largeur_max:
+        if self.animation != 3 and self.rect.right <= self.largeur_max:
             self.rect.left += vitesse
     
     def tirer(self):
-        if self.cooldown == 0 and self.animation == 1:
+        if self.animation != 3 and self.cooldown == 0 and self.animation == 1:
             self.cooldown += 1
             
             match self.puissance_de_feu:

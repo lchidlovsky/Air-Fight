@@ -6,7 +6,7 @@ class gameBar(pygame.Surface):
         pygame.Surface.__init__(self, size)
         self.fill("BLACK")
        
-        self.font = pygame.font.Font(pygame.font.match_font('comicsans'))
+        self.font = pygame.font.Font(pygame.font.match_font('comicsans'), 20)
         self.coeur = pygame.image.load("images/autres/coeur.png").convert_alpha()
         self.demi = pygame.image.load("images/autres/demi_coeur.png").convert_alpha()
         

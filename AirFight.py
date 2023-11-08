@@ -74,7 +74,7 @@ def gestion_controles():
             if event.type == pygame.JOYBUTTONUP:
                 if event.button == conf_bouttons['A']:
                     tirer = False
-                #if event.button == conf_bouttons['LB']: vaisseau_joueur.puissance_de_feu += 1
+                if event.button == conf_bouttons['LB']: vaisseau_joueur.puissance_de_feu += 1
 
                     
             #gestion du joystick gauche de la manette
