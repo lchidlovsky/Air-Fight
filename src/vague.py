@@ -8,7 +8,9 @@ from random import randint, choice
 class Vague:
     """classe représentant une vague d'entités volantes
     """
-    def __init__(self, nom, coord_min, coord_max, joueur, nb_simultanes, nb_petits, nb_moyens, nb_gros, nb_munitions, nb_explosifs):
+    def __init__(self, nom, coord_min, coord_max, joueur, nb_simultanes,
+                 nb_petits, nb_moyens, nb_gros,
+                 nb_coeurs, nb_munitions, nb_explosifs, nb_duplications):
         self.nom = nom
         self.largeur_min = coord_min[0]
         self.hauteur_min = coord_min[1]
@@ -35,11 +37,17 @@ class Vague:
         for g in range(nb_gros):
             self.ennemis.add(Gros((0, 0)))
             
-        for b in range(nb_munitions):
+        for c in range(nb_coeurs):
+            self.bonus.add(Bonus((0, 0), 'coeur'))
+        
+        for m in range(nb_munitions):
             self.bonus.add(Bonus((0, 0), 'munitions'))
             
-        for b in range(nb_explosifs):
+        for e in range(nb_explosifs):
             self.bonus.add(Bonus((0, 0), 'explosif'))
+            
+        for d in range(nb_duplications):
+            self.bonus.add(Bonus((0, 0), 'duplication'))
             
         for i in range(self.nb_simultanes):
             self.placement_ennemi()
@@ -47,7 +55,6 @@ class Vague:
     def placement_bonus(self):
         """méthode de placement aléatoire de bonus à l'écran
         """
-        print("\tnew bonus !!")
         bonus_aleatoire = choice(self.bonus.sprites())
         self.bonus.remove(bonus_aleatoire)
         
@@ -127,6 +134,11 @@ class Vague:
                 self.nb_visibles -= 1
                 self.placement_ennemi()
         
+        for p in self.tirs_ennemis:
+            if p.rect.colliderect(self.joueur) and self.joueur.animation ==1:
+                self.joueur.touche(1)
+                self.tirs_ennemis.remove(p)
+        
         for b in self.bonus_visibles:
             
             #replacement des ennemis arrivés en bas
@@ -137,11 +149,14 @@ class Vague:
             if b.rect.colliderect(self.joueur):
                 self.bonus_visibles.remove(b)
                 match b.type:
+                    case 'coeur':
+                        self.joueur.vie +=2
                     case 'munitions':
                         self.joueur.chargeur += 10
-                        
                     case 'explosif':
                         self.joueur.explosifs += 1
+                    case 'duplication':
+                        self.joueur.duplications += 1
         
     def draw(self, surface):
         self.bonus_visibles.draw(surface)

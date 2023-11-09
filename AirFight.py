@@ -127,13 +127,13 @@ tirer = False
 
 
 #création des entités visuelles
-vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT * 0.8), (0, 60), (SCREEN_WIDTH, SCREEN_HEIGHT), vie_joueur)
+header = gameBar((SCREEN_WIDTH, 60), None)
 
-header = gameBar((SCREEN_WIDTH, 60), vaisseau_joueur)
-
+vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT * 0.8), (0, header.get_height()), (SCREEN_WIDTH, SCREEN_HEIGHT), vie_joueur)
+header.joueur = vaisseau_joueur
 v = Vague("vague de test", coord_min=(0, header.get_height()), coord_max=(SCREEN_WIDTH, SCREEN_HEIGHT),
           joueur=vaisseau_joueur, nb_simultanes=5, nb_petits=3, nb_moyens=1, nb_gros=1,
-          nb_munitions=2, nb_explosifs=3)
+          nb_coeurs=6, nb_munitions=2, nb_explosifs=3, nb_duplications=2)
 
 
 
