@@ -100,9 +100,37 @@ class Vague:
         self.tirs_ennemis.update()
         self.ennemis_visibles.update()
         self.bonus_visibles.update()
-           
-        for e in self.ennemis_visibles:
+        
+        if self.joueur.explosion:
+            for e in self.ennemis_visibles:
+                e.touche(e.vie)
+        self.joueur.explosion = False
+        
+        
+        for b in self.bonus_visibles:
             
+            #replacement des ennemis arrivés en bas
+            if b.rect.top > self.hauteur_max:
+                self.bonus_visibles.remove(b)
+                self.bonus.add(b)
+            
+            #récupération du bonus par le joueur
+            if b.rect.colliderect(self.joueur) and self.joueur.animation != 3:
+                self.bonus_visibles.remove(b)
+                match b.type:
+                    case 'coeur':
+                        self.joueur.vie +=2
+                        self.joueur.animation = 1
+                    case 'munitions':
+                        self.joueur.chargeur += 10
+                    case 'explosif':
+                        self.joueur.explosifs += 1
+                    case 'duplication':
+                        self.joueur.duplications += 1
+        
+        
+        for e in self.ennemis_visibles:
+
             #replacement des ennemis arrivés en bas
             if e.rect.top > self.hauteur_max or e.rect.left > self.largeur_max or e.rect.right < self.largeur_min:
                 self.ennemis_visibles.remove(e)
@@ -119,9 +147,8 @@ class Vague:
             #suppression des ennemis en contact avec le joueur
             if e.vivant and not e.est_touche and self.joueur.animation == 1 and e.rect.colliderect(self.joueur):
                 self.joueur.touche(e.vie)
-                e.touche(vie_gros)
+                e.touche(e.vie)
                 
-                  
             #suppression des ennemis touchés
             for p in self.joueur.projectiles:
                 if e.vivant and p.rect.colliderect(e):
@@ -139,24 +166,6 @@ class Vague:
                 self.joueur.touche(1)
                 self.tirs_ennemis.remove(p)
         
-        for b in self.bonus_visibles:
-            
-            #replacement des ennemis arrivés en bas
-            if b.rect.top > self.hauteur_max:
-                self.bonus_visibles.remove(b)
-                self.bonus.add(b)
-                
-            if b.rect.colliderect(self.joueur):
-                self.bonus_visibles.remove(b)
-                match b.type:
-                    case 'coeur':
-                        self.joueur.vie +=2
-                    case 'munitions':
-                        self.joueur.chargeur += 10
-                    case 'explosif':
-                        self.joueur.explosifs += 1
-                    case 'duplication':
-                        self.joueur.duplications += 1
         
     def draw(self, surface):
         self.bonus_visibles.draw(surface)

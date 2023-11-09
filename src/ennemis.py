@@ -225,7 +225,7 @@ class Gros(Ennemi):
                 self.num_apparence = 0
                 self.image = self.apparences[0]
                 self.horloge_attaque += 1
-                if self.horloge_attaque > len(self.apparences)*30:
+                if self.horloge_attaque > len(self.apparences)*33:
                     self.tir = False
                     self.horloge_attaque = 0
             else:

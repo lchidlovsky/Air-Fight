@@ -49,6 +49,12 @@ def gestion_controles():
                     dep_droit = True
                 if event.key == K_SPACE:
                     tirer = True
+
+                if event.key == K_RETURN:
+                    vaisseau_joueur.boum()
+                
+                if event.key == K_BACKSPACE: vaisseau_joueur.puissance_de_feu += 1
+                
                     
             if event.type == pygame.KEYUP:
                 if event.key == K_UP:
@@ -64,17 +70,16 @@ def gestion_controles():
                     
         else:       #si le joueur utilise la manette
 
-            for nom, num in conf_bouttons.items():
-                if manette.get_button(num):
-                    print("Bouton", nom, "pressé !")
-                    
-                    if nom == 'A':
-                        tirer = True
-                        
-            
+            if event.type == pygame.JOYBUTTONDOWN:
+                if event.button == conf_bouttons['A']:
+                    tirer = True
+                if event.button == conf_bouttons['Y']:
+                    vaisseau_joueur.boum()
+
             if event.type == pygame.JOYBUTTONUP:
                 if event.button == conf_bouttons['A']:
                     tirer = False
+                
                 if event.button == conf_bouttons['LB']: vaisseau_joueur.puissance_de_feu += 1
                 if event.button == conf_bouttons['RB']: w = not w
 
@@ -132,9 +137,8 @@ header = gameBar((SCREEN_WIDTH, 60), None)
 vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT * 0.8), (0, header.get_height()), (SCREEN_WIDTH, SCREEN_HEIGHT), vie_joueur)
 header.joueur = vaisseau_joueur
 v = Vague("vague de test", coord_min=(0, header.get_height()), coord_max=(SCREEN_WIDTH, SCREEN_HEIGHT),
-          joueur=vaisseau_joueur, nb_simultanes=5, nb_petits=3, nb_moyens=1, nb_gros=1,
+          joueur=vaisseau_joueur, nb_simultanes=4, nb_petits=6, nb_moyens=3, nb_gros=1,
           nb_coeurs=6, nb_munitions=2, nb_explosifs=3, nb_duplications=2)
-
 
 
 w = True

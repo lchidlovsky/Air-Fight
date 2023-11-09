@@ -27,10 +27,11 @@ class Joueur(pygame.sprite.Sprite):
         self.image_projectile = pygame.image.load("images/autres/projectile_1.png").convert_alpha()
         self.projectiles = pygame.sprite.Group()
         self.chargeur = chargeur_joueur
-        self.puissance_de_feu = 2
+        self.puissance_de_feu = 1
         self.cadence_tirs = 15
         self.cooldown = 0
         self.explosifs = 0
+        self.explosion = False
         self.duplications = 0
 
     def haut(self, vitesse):
@@ -49,6 +50,11 @@ class Joueur(pygame.sprite.Sprite):
         if self.animation != 3 and self.rect.right <= self.largeur_max:
             self.rect.left += vitesse
     
+    def boum(self):
+        if self.explosifs:
+            self.explosifs -= 1
+            self.explosion = True
+
     def tirer(self):
         if self.cooldown == 0 and self.animation == 1 and self.chargeur > 0:
             self.cooldown += 1
