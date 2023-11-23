@@ -5,7 +5,7 @@ from projectile import Projectile
 class Joueur(pygame.sprite.Sprite):
     """classe représentant le vaisseau du joueur
     """
-    def __init__(self, coord, l_max, h_max, nb_vie):
+    def __init__(self, coord, coord_min, coord_max, nb_vie):
         pygame.sprite.Sprite.__init__(self)
         self.apparences = []
         for i in range(1,8):
@@ -19,37 +19,58 @@ class Joueur(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = coord
         
-        self.largeur_max = l_max
-        self.hauteur_max = h_max
+        self.largeur_min = coord_min[0]
+        self.hauteur_min = coord_min[1]
+        self.largeur_max = coord_max[0]
+        self.hauteur_max = coord_max[1]
         
-        self.image_projectile = pygame.image.load(f"images/autres/projectile_1.png").convert_alpha()
+        self.image_projectile = pygame.image.load("images/autres/projectile_1.png").convert_alpha()
         self.projectiles = pygame.sprite.Group()
+        self.chargeur = chargeur_joueur
         self.puissance_de_feu = 1
         self.cadence_tirs = 15
         self.cooldown = 0
+        
+        self.vitesse = vitesse_joueur
+        self.explosifs = 0
+        self.explosion = False
+        self.duplications = 0
 
-    def coordonnees(self):
-        return self.rect.left, self.rect.top
-
-    def haut(self, vitesse):
-        if self.rect.top - vitesse >= 0:
-            self.rect.top -= vitesse
+    def haut(self):
+        if self.animation != 3 and self.rect.top - self.vitesse >= self.hauteur_min:
+            self.rect.top -= self.vitesse
         
-    def bas(self, vitesse):
-        if self.rect.bottom <= self.hauteur_max:
-            self.rect.top += vitesse
+    def bas(self):
+        if self.animation != 3 and self.rect.bottom <= self.hauteur_max:
+            self.rect.top += self.vitesse
         
-    def gauche(self, vitesse):
-        if self.rect.left - vitesse >= 0:
-            self.rect.left -= vitesse
+    def gauche(self):
+        if self.animation != 3 and self.rect.left - self.vitesse >= self.largeur_min:
+            self.rect.left -= self.vitesse
         
-    def droite(self, vitesse):
-        if self.rect.right <= self.largeur_max:
-            self.rect.left += vitesse
+    def droite(self):
+        if self.animation != 3 and self.rect.right <= self.largeur_max:
+            self.rect.left += self.vitesse
+            
+    def amelioration_puissance_feu(self):
+        if self.puissance_de_feu < 3:
+            self.puissance_de_feu += 1
+            print("PLUS PUISSANT")
+            
+    def amelioration_vitesse(self):
+        self.vitesse += 1
+        print("PLUS RAPIDE")
+        print(self.vitesse, "\n")
     
+    def explosion_generale(self):
+        if self.explosifs and self.vie > 0:
+            self.explosifs -= 1
+            self.explosion = True
+
     def tirer(self):
-        if self.cooldown == 0 and self.animation == 1:
+        if self.cooldown == 0 and self.animation == 1 and self.chargeur > 0:
             self.cooldown += 1
+            self.chargeur -= 1
             
             match self.puissance_de_feu:
                 case 1:
@@ -71,6 +92,7 @@ class Joueur(pygame.sprite.Sprite):
             self.horloge_apparence = 0
             
             if self.vie < 1 and self.animation != 3:
+                self.vie = 0
                 self.animation = 3
                 self.num_apparence = 3
                 self.image = self.apparences[3]
@@ -80,9 +102,10 @@ class Joueur(pygame.sprite.Sprite):
 
     
     def update(self):
+        #animation des projectiles tirés
         self.projectiles.update()
-        for p in self.projectiles:      #animation des projectiles tirés
-            if p.rect.bottom < 0:
+        for p in self.projectiles:
+            if p.rect.bottom < self.hauteur_min:
                 self.projectiles.remove(p)
         
         if self.cooldown > 0:       #gestion de la cadence de tir

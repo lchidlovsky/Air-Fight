@@ -11,9 +11,6 @@ class Projectile(pygame.sprite.Sprite):
         
         self.vitesse = vitesse
         self.direction = direction
-        
-    def coordonnees(self):
-        return self.rect.left, self.rect.top
     
     def update(self):
         match self.direction:

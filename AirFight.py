@@ -16,6 +16,7 @@ def gestion_controles():
     global conf_bouttons
     global dep_haut, dep_bas, dep_gauche, dep_droit
     global tirer
+    global w
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -48,6 +49,12 @@ def gestion_controles():
                     dep_droit = True
                 if event.key == K_SPACE:
                     tirer = True
+
+                if event.key == K_RETURN:
+                    vaisseau_joueur.explosion_generale()
+                
+                if event.key == K_BACKSPACE: vaisseau_joueur.amelioration_puissance_feu()
+                
                     
             if event.type == pygame.KEYUP:
                 if event.key == K_UP:
@@ -63,20 +70,20 @@ def gestion_controles():
                     
         else:       #si le joueur utilise la manette
 
-            for nom, num in conf_bouttons.items():
-                if manette.get_button(num):
-                    print("Bouton", nom, "pressé !")
-                    
-                    if nom == 'A':
-                        tirer = True
-                        
-            
+            if event.type == pygame.JOYBUTTONDOWN:
+                if event.button == conf_bouttons['A']:
+                    tirer = True
+                if event.button == conf_bouttons['Y']:
+                    vaisseau_joueur.explosion_generale()
+
             if event.type == pygame.JOYBUTTONUP:
                 if event.button == conf_bouttons['A']:
                     tirer = False
-                #if event.button == conf_bouttons['LB']: vaisseau_joueur.puissance_de_feu += 1
+                
+                if event.button == conf_bouttons['LB']: vaisseau_joueur.amelioration_puissance_feu()
+                if event.button == conf_bouttons['RB']: w = not w
 
-                    
+
             #gestion du joystick gauche de la manette
             if manette.get_axis(1) < - 0.2:
                 dep_haut = True
@@ -95,10 +102,10 @@ def gestion_controles():
             else:
                 dep_droit = False
                          
-    if dep_haut: vaisseau_joueur.haut(vitesse_joueur)
-    if dep_bas: vaisseau_joueur.bas(vitesse_joueur)
-    if dep_gauche: vaisseau_joueur.gauche(vitesse_joueur)
-    if dep_droit: vaisseau_joueur.droite(vitesse_joueur)
+    if dep_haut: vaisseau_joueur.haut()
+    if dep_bas: vaisseau_joueur.bas()
+    if dep_gauche: vaisseau_joueur.gauche()
+    if dep_droit: vaisseau_joueur.droite()
     if tirer: vaisseau_joueur.tirer()
 
 
@@ -118,17 +125,23 @@ utilisation_clavier = True
 manette = None
 conf_bouttons = conf_xbox
 
-#création du vaisseau du joueur
-vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT //2), SCREEN_WIDTH, SCREEN_HEIGHT, vie_joueur)
 
 #variable d'action du vaisseau
 dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
 tirer = False
 
 
-v = Vague("vague de test", SCREEN_WIDTH, SCREEN_HEIGHT, vaisseau_joueur, 5,
-          nb_petits=3, nb_moyens=1, nb_gros=1)
+#création des entités visuelles
+header = gameBar((SCREEN_WIDTH, 60), None)
 
+vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT * 0.8), (0, header.get_height()), (SCREEN_WIDTH, SCREEN_HEIGHT), vie_joueur)
+header.joueur = vaisseau_joueur
+v = Vague("vague de test", coord_min=(0, header.get_height()), coord_max=(SCREEN_WIDTH, SCREEN_HEIGHT),
+          joueur=vaisseau_joueur, nb_simultanes=4, nb_petits=6, nb_moyens=3, nb_gros=1,
+          nb_coeurs=6, nb_munitions=2, nb_explosifs=3, nb_vitesses=3, nb_feux=2)
+
+
+w = True
 
 jeu_lance = True
 while jeu_lance:
@@ -138,14 +151,17 @@ while jeu_lance:
     
     screen.fill((222, 222, 222))
     
+    
+    #mise à jour des entités
     vaisseau_joueur.update()
+    if w: v.update()
     
-    v.update()
-    
+    #affichage des entités
     v.draw(screen)
-
     vaisseau_joueur.projectiles.draw(screen)
     screen.blit(vaisseau_joueur.image, vaisseau_joueur.rect.topleft)
+    header.draw(screen)
+    
     
     pygame.display.flip()       #mise à jour de l'affichage
             

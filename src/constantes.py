@@ -2,9 +2,12 @@ nom_du_jeu = "Air Fight"
 
 FPS = 60
 
-vie_joueur = 4
+vie_joueur = 6
 vitesse_joueur = 5
-vitesse_projectile_joueur = 10
+vitesse_projectile_joueur = 12
+chargeur_joueur = 30
+
+vitesse_bonus = 2
 
 vie_petit = 2
 vitesse_petit = 3
