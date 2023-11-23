@@ -75,7 +75,7 @@ class Ennemi(pygame.sprite.Sprite):
 class Petit(Ennemi):
     """classe représentant un petit ennemi
     """
-    def __init__(self, coord):
+    def __init__(self, coord=(0,0)):
         
         apparences = []
         for i in range(1,6):
@@ -87,7 +87,7 @@ class Petit(Ennemi):
 class Moyen(Ennemi):
     """classe représentant un ennemi de taille moyenne
     """
-    def __init__(self, coord):
+    def __init__(self, coord=(0,0)):
         
         apparences = []
         for i in range(1,7):
@@ -118,7 +118,7 @@ class Moyen(Ennemi):
 class Gros(Ennemi):
     """classe représentant un gros ennemi
     """
-    def __init__(self, coord):
+    def __init__(self, coord=(0,0)):
         
         apparences = []
         for i in range(1,11):

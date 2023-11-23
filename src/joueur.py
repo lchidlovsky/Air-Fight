@@ -55,9 +55,12 @@ class Joueur(pygame.sprite.Sprite):
     def amelioration_puissance_feu(self):
         if self.puissance_de_feu < 3:
             self.puissance_de_feu += 1
+            print("PLUS PUISSANT")
             
     def amelioration_vitesse(self):
-        self.vitesse += 2
+        self.vitesse += 1
+        print("PLUS RAPIDE")
+        print(self.vitesse, "\n")
     
     def explosion_generale(self):
         if self.explosifs and self.vie > 0:

@@ -138,7 +138,7 @@ vaisseau_joueur = Joueur((SCREEN_WIDTH //2, SCREEN_HEIGHT * 0.8), (0, header.get
 header.joueur = vaisseau_joueur
 v = Vague("vague de test", coord_min=(0, header.get_height()), coord_max=(SCREEN_WIDTH, SCREEN_HEIGHT),
           joueur=vaisseau_joueur, nb_simultanes=4, nb_petits=6, nb_moyens=3, nb_gros=1,
-          nb_coeurs=6, nb_munitions=2, nb_explosifs=3, nb_duplications=2)
+          nb_coeurs=6, nb_munitions=2, nb_explosifs=3, nb_vitesses=3, nb_feux=2)
 
 
 w = True

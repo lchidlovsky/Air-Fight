@@ -10,7 +10,7 @@ class Vague:
     """
     def __init__(self, nom, coord_min, coord_max, joueur, nb_simultanes,
                  nb_petits, nb_moyens, nb_gros,
-                 nb_coeurs, nb_munitions, nb_explosifs, nb_duplications):
+                 nb_coeurs, nb_munitions, nb_explosifs, nb_vitesses, nb_feux):
         self.nom = nom
         self.largeur_min = coord_min[0]
         self.hauteur_min = coord_min[1]
@@ -29,25 +29,28 @@ class Vague:
         self.bonus_visibles = pygame.sprite.Group()
         
         for p in range(nb_petits):
-            self.ennemis.add(Petit((0, 0)))
+            self.ennemis.add(Petit())
             
         for m in range(nb_moyens):
-            self.ennemis.add(Moyen((0, 0)))
+            self.ennemis.add(Moyen())
         
         for g in range(nb_gros):
-            self.ennemis.add(Gros((0, 0)))
+            self.ennemis.add(Gros())
             
         for c in range(nb_coeurs):
-            self.bonus.add(Bonus((0, 0), 'coeur'))
+            self.bonus.add(Bonus(type='coeur'))
         
         for m in range(nb_munitions):
-            self.bonus.add(Bonus((0, 0), 'munitions'))
+            self.bonus.add(Bonus(type='munitions'))
             
         for e in range(nb_explosifs):
-            self.bonus.add(Bonus((0, 0), 'explosif'))
+            self.bonus.add(Bonus(type='explosif'))
             
-        for d in range(nb_duplications):
-            self.bonus.add(Bonus((0, 0), 'duplication'))
+        for v in range(nb_vitesses):
+            self.bonus.add(Bonus(type='vitesse'))
+            
+        for f in range(nb_feux):
+            self.bonus.add(Bonus(type='feu'))
             
         for i in range(self.nb_simultanes):
             self.placement_ennemi()
@@ -71,7 +74,7 @@ class Vague:
     def placement_ennemi(self):
         """méthode de placement aléatoire des nouveaux ennemis à l'écran
         """
-        if not randint(0, 4) and self.bonus: self.placement_bonus()
+        if not randint(0, 4//4) and self.bonus: self.placement_bonus()
         
         if self.nb_visibles < self.nb_simultanes and self.ennemis:
             self.nb_visibles += 1
@@ -125,6 +128,10 @@ class Vague:
                         self.joueur.chargeur += 10
                     case 'explosif':
                         self.joueur.explosifs += 1
+                    case 'vitesse':
+                        self.joueur.amelioration_vitesse()
+                    case 'feu':
+                        self.joueur.amelioration_puissance_feu()
                     case 'duplication':
                         self.joueur.duplications += 1
         
