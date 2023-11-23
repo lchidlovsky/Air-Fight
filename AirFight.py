@@ -51,9 +51,9 @@ def gestion_controles():
                     tirer = True
 
                 if event.key == K_RETURN:
-                    vaisseau_joueur.boum()
+                    vaisseau_joueur.explosion_generale()
                 
-                if event.key == K_BACKSPACE: vaisseau_joueur.puissance_de_feu += 1
+                if event.key == K_BACKSPACE: vaisseau_joueur.amelioration_puissance_feu()
                 
                     
             if event.type == pygame.KEYUP:
@@ -74,16 +74,16 @@ def gestion_controles():
                 if event.button == conf_bouttons['A']:
                     tirer = True
                 if event.button == conf_bouttons['Y']:
-                    vaisseau_joueur.boum()
+                    vaisseau_joueur.explosion_generale()
 
             if event.type == pygame.JOYBUTTONUP:
                 if event.button == conf_bouttons['A']:
                     tirer = False
                 
-                if event.button == conf_bouttons['LB']: vaisseau_joueur.puissance_de_feu += 1
+                if event.button == conf_bouttons['LB']: vaisseau_joueur.amelioration_puissance_feu()
                 if event.button == conf_bouttons['RB']: w = not w
 
-                    
+
             #gestion du joystick gauche de la manette
             if manette.get_axis(1) < - 0.2:
                 dep_haut = True
@@ -102,10 +102,10 @@ def gestion_controles():
             else:
                 dep_droit = False
                          
-    if dep_haut: vaisseau_joueur.haut(vitesse_joueur)
-    if dep_bas: vaisseau_joueur.bas(vitesse_joueur)
-    if dep_gauche: vaisseau_joueur.gauche(vitesse_joueur)
-    if dep_droit: vaisseau_joueur.droite(vitesse_joueur)
+    if dep_haut: vaisseau_joueur.haut()
+    if dep_bas: vaisseau_joueur.bas()
+    if dep_gauche: vaisseau_joueur.gauche()
+    if dep_droit: vaisseau_joueur.droite()
     if tirer: vaisseau_joueur.tirer()
 
 

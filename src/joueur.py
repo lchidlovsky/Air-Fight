@@ -30,28 +30,37 @@ class Joueur(pygame.sprite.Sprite):
         self.puissance_de_feu = 1
         self.cadence_tirs = 15
         self.cooldown = 0
+        
+        self.vitesse = vitesse_joueur
         self.explosifs = 0
         self.explosion = False
         self.duplications = 0
 
-    def haut(self, vitesse):
-        if self.animation != 3 and self.rect.top - vitesse >= self.hauteur_min:
-            self.rect.top -= vitesse
+    def haut(self):
+        if self.animation != 3 and self.rect.top - self.vitesse >= self.hauteur_min:
+            self.rect.top -= self.vitesse
         
-    def bas(self, vitesse):
+    def bas(self):
         if self.animation != 3 and self.rect.bottom <= self.hauteur_max:
-            self.rect.top += vitesse
+            self.rect.top += self.vitesse
         
-    def gauche(self, vitesse):
-        if self.animation != 3 and self.rect.left - vitesse >= self.largeur_min:
-            self.rect.left -= vitesse
+    def gauche(self):
+        if self.animation != 3 and self.rect.left - self.vitesse >= self.largeur_min:
+            self.rect.left -= self.vitesse
         
-    def droite(self, vitesse):
+    def droite(self):
         if self.animation != 3 and self.rect.right <= self.largeur_max:
-            self.rect.left += vitesse
+            self.rect.left += self.vitesse
+            
+    def amelioration_puissance_feu(self):
+        if self.puissance_de_feu < 3:
+            self.puissance_de_feu += 1
+            
+    def amelioration_vitesse(self):
+        self.vitesse += 2
     
-    def boum(self):
-        if self.explosifs:
+    def explosion_generale(self):
+        if self.explosifs and self.vie > 0:
             self.explosifs -= 1
             self.explosion = True
 
