@@ -5,3 +5,4 @@ from projectile import *
 from ennemis import *
 from vague import *
 from gamebar import *
+from menu import *
