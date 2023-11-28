@@ -41,8 +41,10 @@ def gestion_controles():
             if event.type == pygame.KEYDOWN:
                 if event.key == K_UP:
                     dep_haut = True
+                    visible.haut()
                 if event.key == K_DOWN:
                     dep_bas = True
+                    visible.bas()
                 if event.key == K_LEFT:
                     dep_gauche = True
                 if event.key == K_RIGHT:
@@ -87,10 +89,12 @@ def gestion_controles():
             #gestion du joystick gauche de la manette
             if manette.get_axis(1) < - 0.2:
                 dep_haut = True
+                visible.haut()
             else:
                 dep_haut = False
             if manette.get_axis(1) > 0.2:
                 dep_bas = True
+                visible.bas()
             else:
                 dep_bas = False
             if manette.get_axis(0) < - 0.2:
@@ -141,6 +145,12 @@ v = Vague("vague de test", coord_min=(0, header.get_height()), coord_max=(SCREEN
           nb_coeurs=6, nb_munitions=2, nb_explosifs=3, nb_vitesses=3, nb_feux=2)
 
 
+
+
+menu = MenuAccueil((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+visible = menu
+
 w = True
 
 jeu_lance = True
@@ -152,15 +162,20 @@ while jeu_lance:
     screen.fill((222, 222, 222))
     
     
-    #mise à jour des entités
-    vaisseau_joueur.update()
-    if w: v.update()
+    visible.update()
+    visible.draw(screen)
     
-    #affichage des entités
-    v.draw(screen)
-    vaisseau_joueur.projectiles.draw(screen)
-    screen.blit(vaisseau_joueur.image, vaisseau_joueur.rect.topleft)
-    header.draw(screen)
+    
+    if False:
+        #mise à jour des entités
+        vaisseau_joueur.update()
+        if w: v.update()
+        
+        #affichage des entités
+        v.draw(screen)
+        vaisseau_joueur.projectiles.draw(screen)
+        screen.blit(vaisseau_joueur.image, vaisseau_joueur.rect.topleft)
+        header.draw(screen)
     
     
     pygame.display.flip()       #mise à jour de l'affichage
