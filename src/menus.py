@@ -3,13 +3,13 @@ from constantes import *
 
 
 class Bouton:
-    """classe représentant le bouton d'un menu
+    """classe représentant un bouton d'un menu
     """
-    
+
     def __init__(self, message, coord_visible, coord_cache):
         self.longueur = 290
         self.largeur = 70
-        self.vitesse_deplacement = 9
+        self.vitesse_deplacement = 11
         
         self.coord_cache = [
             coord_cache[0] - coord_cache[0] % self.vitesse_deplacement - self.longueur //2,
@@ -47,7 +47,7 @@ class Bouton:
             if self.horloge_message % 5 == 0:
                 self.taille_message += (1 if self.grossir_message else -1)
             
-            if self.taille_message == 17 or self.taille_message == 33:
+            if self.taille_message == 19 or self.taille_message == 31:
                 self.grossir_message = not self.grossir_message
         else:
             self.horloge_message = 0
@@ -76,9 +76,22 @@ class Bouton:
         message = font.render(self.message, True, "BLACK")
         surface.blit(message, (self.topleft[0] + self.longueur //2 - message.get_width() // 2, self.topleft[1] + self.largeur // 2 - message.get_height() // 2))
         
-        #affichage du rectangle
-        pygame.draw.rect(surface, 'BLACK', pygame.Rect(self.topleft, (self.longueur, self.largeur)), 4, 20)
-
+        if self.selectionne:
+            #affichage de l'octogone
+            ecart = self.largeur//4
+            pygame.draw.polygon(surface, "BLACK", [
+                (self.topleft[0]+ecart, self.topleft[1]),
+                (self.topleft[0]+self.longueur-ecart, self.topleft[1]),
+                (self.topleft[0]+self.longueur, self.topleft[1]+ecart),
+                (self.topleft[0]+self.longueur, self.topleft[1]+self.largeur-ecart),
+                (self.topleft[0]+self.longueur-ecart, self.topleft[1]+self.largeur),
+                (self.topleft[0]+ecart, self.topleft[1]+self.largeur),
+                (self.topleft[0], self.topleft[1]+self.largeur-ecart),
+                (self.topleft[0], self.topleft[1]+ecart)
+            ], 5)
+        else:
+            #affichage du rectangle
+            pygame.draw.rect(surface, 'BLACK', pygame.Rect(self.topleft, (self.longueur, self.largeur)), 5, 20)
 
 
 class MenuAccueil(pygame.Surface):
@@ -96,20 +109,22 @@ class MenuAccueil(pygame.Surface):
             Bouton("OPTIONS", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190)),
             Bouton("QUITTER", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +340)),
             Bouton("MUSIQUE : OUI", (self.longueur_max //2+280, self.hauteur_max//2-60), (self.longueur_max +150, self.hauteur_max//2-60)),
-            Bouton("MENU", (self.longueur_max //2+280, self.hauteur_max//2+60), (self.longueur_max +150, self.hauteur_max//2+60))
+            Bouton("RETOUR", (self.longueur_max //2+280, self.hauteur_max//2+60), (self.longueur_max +150, self.hauteur_max//2+60))
         ]
         self.boutons_entrants = []
         self.boutons_sortants = []
         
         self.curseur = 0
+        self.cooldown = 0
         self.page = 0
         self.transition_en_cours = False
+        self.visibilite = 255
         self.continu = True
         
-        self.transition_menu()
+        self.transition_accueil()
         
         
-    def transition_menu(self):
+    def transition_accueil(self):
         if not self.transition_en_cours:
             self.curseur = 0
             self.page = 0
@@ -170,8 +185,10 @@ class MenuAccueil(pygame.Surface):
             self.boutons_entrants.clear()
             
     def haut(self):
-        if not self.transition_en_cours:
+        if not self.transition_en_cours and self.cooldown == 0:
+            self.cooldown = 1
             limite = 0
+            
             match self.page:
                 case 0:
                     limite = 0
@@ -183,11 +200,12 @@ class MenuAccueil(pygame.Surface):
                 self.boutons[self.curseur].selectionne = False
                 self.curseur -= 1
                 self.boutons[self.curseur].selectionne = True
-            print("\nUP\ncurseur =", self.curseur)
     
     def bas(self):
-        if not self.transition_en_cours:
+        if not self.transition_en_cours and self.cooldown == 0:
+            self.cooldown = 1
             limite = 0
+            
             match self.page:
                 case 0:
                     limite = 2
@@ -197,7 +215,6 @@ class MenuAccueil(pygame.Surface):
                 self.boutons[self.curseur].selectionne = False
                 self.curseur += 1
                 self.boutons[self.curseur].selectionne = True
-            print("\nDOWN\ncurseur =", self.curseur)
                         
     def selection(self):
         if not self.transition_en_cours:
@@ -212,10 +229,12 @@ class MenuAccueil(pygame.Surface):
                     #activer/désactiver le son
                     pass
                 case 4:
-                    self.transition_menu()
+                    self.transition_accueil()
                             
                     
     def update(self):
+        if self.cooldown: self.cooldown += 1
+        if self.cooldown > 18 : self.cooldown = 0
         for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].update()
         
@@ -231,19 +250,11 @@ class MenuAccueil(pygame.Surface):
                 self.transition_en_cours = False
                 if self.boutons_entrants: self.boutons[self.boutons_entrants[0]].selectionne = True
                 if self.page == 3: self.continu = False
+        
     
     def draw(self, surface):
         surface.blit(self, (0, 0))
         
         for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].draw(surface)
-        
-        #affichage des données de debuggage
-        font = pygame.font.Font(pygame.font.match_font(POLICE), 22)
-        message = font.render("visible = "+("True" if self.boutons[0].visible else "False")+"  desti = "+self.boutons[0].desti(), True, "BLACK")
-        surface.blit(message, (30, 30))
-        message = font.render(
-            str([self.boutons[b].message for b in self.boutons_sortants]) +
-            str([self.boutons[b].message for b in self.boutons_entrants]), True, "BLACK")
-        surface.blit(message, (30, 70))
         

@@ -9,7 +9,6 @@ from src import *
 def gestion_controles():
     """fonction gérant les actions du joueur
     """
-    global jeu_lance
     global vaisseau_joueur
     global utilisation_clavier
     global manette
@@ -88,26 +87,25 @@ def gestion_controles():
                 if event.button == conf_bouttons['LB']: vaisseau_joueur.amelioration_puissance_feu()
                 if event.button == conf_bouttons['RB']: w = not w
 
-
-            #gestion du joystick gauche de la manette
-            if manette.get_axis(1) < - 0.2:
-                dep_haut = True
-                visible.haut()
-            else:
-                dep_haut = False
-            if manette.get_axis(1) > 0.2:
-                dep_bas = True
-                visible.bas()
-            else:
-                dep_bas = False
-            if manette.get_axis(0) < - 0.2:
-                dep_gauche = True
-            else:
-                dep_gauche = False
-            if manette.get_axis(0) > 0.2:
-                dep_droit = True
-            else:
-                dep_droit = False
+            if event.type == pygame.JOYAXISMOTION:      #gestion du joystick gauche de la manette
+                if manette.get_axis(1) < - 0.3:
+                    dep_haut = True
+                    visible.haut()
+                else:
+                    dep_haut = False
+                if manette.get_axis(1) > 0.3:
+                    dep_bas = True
+                    visible.bas()
+                else:
+                    dep_bas = False
+                if manette.get_axis(0) < - 0.3:
+                    dep_gauche = True
+                else:
+                    dep_gauche = False
+                if manette.get_axis(0) > 0.3:
+                    dep_droit = True
+                else:
+                    dep_droit = False
                          
     if dep_haut: vaisseau_joueur.haut()
     if dep_bas: vaisseau_joueur.bas()
@@ -169,20 +167,22 @@ while visible.continu:
     visible.update()
     visible.draw(screen)
     
-    
-    if False:
-        #mise à jour des entités
-        vaisseau_joueur.update()
-        if w: v.update()
-        
-        #affichage des entités
-        v.draw(screen)
-        vaisseau_joueur.projectiles.draw(screen)
-        screen.blit(vaisseau_joueur.image, vaisseau_joueur.rect.topleft)
-        header.draw(screen)
-    
-    
     pygame.display.flip()       #mise à jour de l'affichage
+    
+    continue
+
+    #mise à jour des entités
+    vaisseau_joueur.update()
+    if w: v.update()
+    
+    #affichage des entités
+    v.draw(screen)
+    vaisseau_joueur.projectiles.draw(screen)
+    screen.blit(vaisseau_joueur.image, vaisseau_joueur.rect.topleft)
+    header.draw(screen)
+    
+    
+    
             
 
 print("Merci d'avoir joué !")
