@@ -53,14 +53,11 @@ class Joueur(pygame.sprite.Sprite):
             self.rect.left += self.vitesse
             
     def amelioration_puissance_feu(self):
-        if self.puissance_de_feu < 3:
+        if self.puissance_de_feu < 4:
             self.puissance_de_feu += 1
-            print("PLUS PUISSANT")
             
     def amelioration_vitesse(self):
         self.vitesse += 1
-        print("PLUS RAPIDE")
-        print(self.vitesse, "\n")
     
     def explosion_generale(self):
         if self.explosifs and self.vie > 0:
@@ -83,6 +80,12 @@ class Joueur(pygame.sprite.Sprite):
                 case 3:
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +16, self.rect.top +44), vitesse_projectile_joueur, 0))
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +50, self.rect.top +5), vitesse_projectile_joueur, 0))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +80, self.rect.top +44), vitesse_projectile_joueur, 0))
+                    
+                case 4:
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +16, self.rect.top +44), vitesse_projectile_joueur, 0))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +40, self.rect.top +20), vitesse_projectile_joueur, 0))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +60, self.rect.top +20), vitesse_projectile_joueur, 0))
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +80, self.rect.top +44), vitesse_projectile_joueur, 0))
 
 

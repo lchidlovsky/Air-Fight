@@ -78,16 +78,16 @@ class Bouton:
         
         if self.selectionne:
             #affichage de l'octogone
-            ecart = self.largeur//4
+            coin = self.largeur//4
             pygame.draw.polygon(surface, "BLACK", [
-                (self.topleft[0]+ecart, self.topleft[1]),
-                (self.topleft[0]+self.longueur-ecart, self.topleft[1]),
-                (self.topleft[0]+self.longueur, self.topleft[1]+ecart),
-                (self.topleft[0]+self.longueur, self.topleft[1]+self.largeur-ecart),
-                (self.topleft[0]+self.longueur-ecart, self.topleft[1]+self.largeur),
-                (self.topleft[0]+ecart, self.topleft[1]+self.largeur),
-                (self.topleft[0], self.topleft[1]+self.largeur-ecart),
-                (self.topleft[0], self.topleft[1]+ecart)
+                (self.topleft[0]+coin, self.topleft[1]),
+                (self.topleft[0]+self.longueur-coin, self.topleft[1]),
+                (self.topleft[0]+self.longueur, self.topleft[1]+coin),
+                (self.topleft[0]+self.longueur, self.topleft[1]+self.largeur-coin),
+                (self.topleft[0]+self.longueur-coin, self.topleft[1]+self.largeur),
+                (self.topleft[0]+coin, self.topleft[1]+self.largeur),
+                (self.topleft[0], self.topleft[1]+self.largeur-coin),
+                (self.topleft[0], self.topleft[1]+coin)
             ], 5)
         else:
             #affichage du rectangle
@@ -114,14 +114,14 @@ class MenuAccueil(pygame.Surface):
         self.boutons_entrants = []
         self.boutons_sortants = []
         
+        self.continu = True
         self.curseur = 0
         self.cooldown = 0
-        self.page = 0
+        self.page = -1
         self.transition_en_cours = False
-        self.visibilite = 255
-        self.continu = True
         
-        self.transition_accueil()
+        self.ecran_noir = pygame.Surface((self.longueur_max, self.hauteur_max))
+        self.visibilite = 0
         
         
     def transition_accueil(self):
@@ -129,6 +129,7 @@ class MenuAccueil(pygame.Surface):
             self.curseur = 0
             self.page = 0
             self.transition_en_cours = True
+            self.visibilite = 255
             
             #on fait transitionner tous les boutons déjà présents
             for b in self.boutons_entrants:
@@ -147,6 +148,7 @@ class MenuAccueil(pygame.Surface):
             self.curseur = 0
             self.page = 1
             self.transition_en_cours = True
+            self.visibilite = 252
             
             #on fait transitionner tous les boutons déjà présents
             for b in self.boutons_entrants:
@@ -233,23 +235,33 @@ class MenuAccueil(pygame.Surface):
                             
                     
     def update(self):
-        if self.cooldown: self.cooldown += 1
-        if self.cooldown > 18 : self.cooldown = 0
-        for b in self.boutons_sortants + self.boutons_entrants:
-            self.boutons[b].update()
-        
-        #on fait diparaitre tous les boutons venant de sortir de l'écran
-        if self.transition_en_cours:
-            disparition = True
+        #effet d'apparition en fondu
+        if self.page == -1:
+            if self.visibilite < 255:
+                self.visibilite += 3
+            else:
+                self.transition_accueil()
+        else:
+            if self.cooldown: self.cooldown += 1
+            if self.cooldown > 18 : self.cooldown = 0
             for b in self.boutons_sortants + self.boutons_entrants:
-                if not self.boutons[b].en_place():
-                    disparition = False
-                    break
-            if disparition:
-                self.boutons_sortants.clear()
-                self.transition_en_cours = False
-                if self.boutons_entrants: self.boutons[self.boutons_entrants[0]].selectionne = True
-                if self.page == 3: self.continu = False
+                self.boutons[b].update()
+            
+            #on fait diparaitre tous les boutons venant de sortir de l'écran
+            if self.transition_en_cours:
+                disparition = True
+                for b in self.boutons_sortants + self.boutons_entrants:
+                    if not self.boutons[b].en_place():
+                        disparition = False
+                        break
+                if disparition:
+                    self.boutons_sortants.clear()
+                    self.transition_en_cours = False
+                    if self.boutons_entrants: self.boutons[self.boutons_entrants[0]].selectionne = True
+                    if self.page == 3: self.continu = False
+            else:
+                if self.page == 1 and 2 < self.visibilite < 255:
+                    self.visibilite -= 3
         
     
     def draw(self, surface):
@@ -257,4 +269,6 @@ class MenuAccueil(pygame.Surface):
         
         for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].draw(surface)
-        
+
+        self.ecran_noir.set_alpha(255-self.visibilite)
+        surface.blit(self.ecran_noir, (0, 0))

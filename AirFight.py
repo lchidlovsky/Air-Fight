@@ -183,6 +183,8 @@ while visible.continu:
     
     
     
+    
+    
             
 
 print("Merci d'avoir joué !")
