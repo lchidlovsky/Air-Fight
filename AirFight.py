@@ -51,6 +51,7 @@ def gestion_controles():
                     dep_droit = True
                 if event.key == K_SPACE:
                     tirer = True
+                    visible.selection()
 
                 if event.key == K_RETURN:
                     vaisseau_joueur.explosion_generale()
@@ -75,6 +76,7 @@ def gestion_controles():
             if event.type == pygame.JOYBUTTONDOWN:
                 if event.button == conf_bouttons['A']:
                     tirer = True
+                    visible.selection()
                 if event.button == conf_bouttons['Y']:
                     vaisseau_joueur.explosion_generale()
 

@@ -7,7 +7,7 @@ class Bouton:
     """
     
     def __init__(self, message, coord_visible, coord_cache):
-        self.longueur = 220
+        self.longueur = 290
         self.largeur = 70
         self.vitesse_deplacement = 8
         
@@ -90,8 +90,8 @@ class MenuAccueil(pygame.Surface):
             Bouton("JOUER", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max +50)),
             Bouton("OPTIONS", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +200)),
             Bouton("QUITTER", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +350)),
-            Bouton("MUSIQUE : OUI", (int(self.longueur_max * 0.75), self.hauteur_max-100), (self.longueur_max +50, self.hauteur_max-100)),
-            Bouton("MENU", (int(self.longueur_max * 0.75), self.hauteur_max+100), (self.longueur_max +50, self.hauteur_max+100))
+            Bouton("MUSIQUE : OUI", (int(self.longueur_max * 0.75), self.hauteur_max//2-100), (self.longueur_max +50, self.hauteur_max//2-100)),
+            Bouton("MENU", (int(self.longueur_max * 0.75), self.hauteur_max//2+100), (self.longueur_max +50, self.hauteur_max//2+100))
         ]
         self.boutons_entrants = []
         self.boutons_sortants = []
@@ -111,6 +111,7 @@ class MenuAccueil(pygame.Surface):
             #on fait transitionner tous les boutons déjà présents
             for b in self.boutons_entrants:
                 self.boutons[b].transition()
+                print(self.boutons[b].message)
                 self.boutons_sortants.append(b)
             
             #on insère les trois boutons présents dans le menu principal
@@ -119,6 +120,7 @@ class MenuAccueil(pygame.Surface):
                 self.boutons_entrants.append(i)
                 
             self.boutons_entrants = self.boutons_entrants[-3:]
+            print(self.curseur)
 
     def transition_jouer(self):
         if not self.transition_en_cours:
@@ -134,13 +136,14 @@ class MenuAccueil(pygame.Surface):
         
     def transition_options(self):
         if not self.transition_en_cours:
-            self.curseur = 0
+            self.curseur = 3
             self.page = 2
             self.transition_en_cours = True
             
             #on fait transitionner tous les boutons déjà présents
             for b in self.boutons_entrants:
                 self.boutons[b].transition()
+                print(self.boutons[b].message)
                 self.boutons_sortants.append(b)
             
             #on insère les trois boutons présents dans le menu principal
@@ -149,6 +152,8 @@ class MenuAccueil(pygame.Surface):
                 self.boutons_entrants.append(i)
                 
             self.boutons_entrants = self.boutons_entrants[-2:]
+            
+            print(self.curseur)
     
     def transition_quitter(self):
         if not self.transition_en_cours:
@@ -164,34 +169,51 @@ class MenuAccueil(pygame.Surface):
             
     def haut(self):
         if not self.transition_en_cours:
+            limite = 0
             match self.page:
-                
-                #page d'accueil
                 case 0:
-                    if self.curseur-1 >= 0:
-                        self.boutons[self.curseur].selectionne = False
-                        self.curseur -= 1
-                        self.boutons[self.curseur].selectionne = True
+                    limite = 0
                 
-                #page des options
                 case 2:
-                    pass
+                    limite = 3
+                    
+            if self.curseur-1 >= limite:
+                self.boutons[self.curseur].selectionne = False
+                self.curseur -= 1
+                self.boutons[self.curseur].selectionne = True
+            print("\nUP\ncurseur =", self.curseur)
     
     def bas(self):
         if not self.transition_en_cours:
+            limite = 0
             match self.page:
-                
-                #page d'accueil
                 case 0:
-                    if self.curseur+1 <= 2:
-                        self.boutons[self.curseur].selectionne = False
-                        self.curseur += 1
-                        self.boutons[self.curseur].selectionne = True
-                
-                #page des options
+                    limite = 2
                 case 2:
+                    limite = 4
+            if self.curseur+1 <= limite:
+                self.boutons[self.curseur].selectionne = False
+                self.curseur += 1
+                self.boutons[self.curseur].selectionne = True
+            print("\nDOWN\ncurseur =", self.curseur)
+                        
+    def selection(self):
+        if not self.transition_en_cours:
+            match self.curseur:
+                case 0:
+                    self.transition_jouer()
+                case 1:
+                    self.transition_options()
+                case 2:
+                    self.transition_quitter()
+                case 3:
+                    #activer/désactiver le son
                     pass
-        
+                case 4:
+                    self.transition_menu()
+                            
+                    
+            
     def update(self):
         for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].update()
@@ -206,12 +228,12 @@ class MenuAccueil(pygame.Surface):
             if disparition:
                 self.boutons_sortants.clear()
                 self.transition_en_cours = False
-                self.curseur = 0
-                self.boutons[self.boutons_entrants[0]].selectionne = True
+                if self.boutons_entrants: self.boutons[self.boutons_entrants[0]].selectionne = True
     
     def draw(self, surface):
         surface.blit(self, (0, 0))
         
         for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].draw(surface)
-            
+        
+        #print(self.boutons[0].topleft)
