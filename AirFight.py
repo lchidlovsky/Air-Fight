@@ -20,7 +20,8 @@ def gestion_controles():
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-                jeu_lance = False
+                #jeu_lance = False
+                visible.continu = False
         
         if event.type == pygame.JOYDEVICEADDED:     #si une manette est branchée
             pygame.joystick.init()
@@ -119,8 +120,8 @@ def gestion_controles():
 #mise en place de la fenêtre de jeu
 pygame.init()
 screen = pygame.display.set_mode()
-SCREEN_HEIGHT = int(screen.get_height() * 0.8)
-SCREEN_WIDTH = int(screen.get_width() * 0.8)
+SCREEN_HEIGHT = int(screen.get_height() * 0.88)
+SCREEN_WIDTH = int(screen.get_width() * 0.88)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(nom_du_jeu)
 
@@ -155,8 +156,9 @@ visible = menu
 
 w = True
 
-jeu_lance = True
-while jeu_lance:
+while visible.continu:
+#jeu_lance = True
+#while jeu_lance:
     clock.tick(FPS)
     
     gestion_controles()

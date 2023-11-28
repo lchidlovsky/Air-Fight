@@ -56,4 +56,3 @@ class gameBar(pygame.Surface):
             
             pos -= self.duplication.get_width() + 20
             surface.blit(self.duplication, (pos, self.get_height() // 2 - self.duplication.get_height() // 2))
-        

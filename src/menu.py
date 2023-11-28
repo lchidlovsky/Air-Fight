@@ -9,7 +9,7 @@ class Bouton:
     def __init__(self, message, coord_visible, coord_cache):
         self.longueur = 290
         self.largeur = 70
-        self.vitesse_deplacement = 8
+        self.vitesse_deplacement = 9
         
         self.coord_cache = [
             coord_cache[0] - coord_cache[0] % self.vitesse_deplacement - self.longueur //2,
@@ -17,7 +17,7 @@ class Bouton:
         self.coord_visible = [
             coord_visible[0] - coord_visible[0] % self.vitesse_deplacement - self.longueur //2,
             coord_visible[1] - coord_visible[1] % self.vitesse_deplacement - self.largeur //2]
-        self.topleft = self.coord_cache
+        self.topleft = [self.coord_cache[0], self.coord_cache[1]]
         
         self.message = message
         self.horloge_message = 0
@@ -32,7 +32,12 @@ class Bouton:
         if not self.visible : self.selectionne = False
         
     def en_place(self):
-        return self.topleft == (self.coord_visible if self.visible else self.coord_cache)
+        return self.topleft == (self.coord_visible if self.visible==True else self.coord_cache)
+    
+    def desti(self):
+        if self.visible:
+            return "coord_visible"
+        return "coord_cache"
     
     def update(self):
         #gestion de la taille du message
@@ -50,7 +55,7 @@ class Bouton:
             self.taille_message = 25
 
         #gestion du déplacement du bouton
-        destination = (self.coord_visible if self.visible else self.coord_cache)
+        destination = (self.coord_visible if self.visible==True else self.coord_cache)
         if self.topleft != destination:
             #cas du déplacement vers haut
             if self.topleft[1] > destination[1]:
@@ -87,11 +92,11 @@ class MenuAccueil(pygame.Surface):
         self.hauteur_max = size[1]
         
         self.boutons = [
-            Bouton("JOUER", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max +50)),
-            Bouton("OPTIONS", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +200)),
-            Bouton("QUITTER", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +350)),
-            Bouton("MUSIQUE : OUI", (int(self.longueur_max * 0.75), self.hauteur_max//2-100), (self.longueur_max +50, self.hauteur_max//2-100)),
-            Bouton("MENU", (int(self.longueur_max * 0.75), self.hauteur_max//2+100), (self.longueur_max +50, self.hauteur_max//2+100))
+            Bouton("JOUER", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40)),
+            Bouton("OPTIONS", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190)),
+            Bouton("QUITTER", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +340)),
+            Bouton("MUSIQUE : OUI", (self.longueur_max //2+280, self.hauteur_max//2-60), (self.longueur_max +150, self.hauteur_max//2-60)),
+            Bouton("MENU", (self.longueur_max //2+280, self.hauteur_max//2+60), (self.longueur_max +150, self.hauteur_max//2+60))
         ]
         self.boutons_entrants = []
         self.boutons_sortants = []
@@ -99,8 +104,10 @@ class MenuAccueil(pygame.Surface):
         self.curseur = 0
         self.page = 0
         self.transition_en_cours = False
+        self.continu = True
         
         self.transition_menu()
+        
         
     def transition_menu(self):
         if not self.transition_en_cours:
@@ -111,7 +118,6 @@ class MenuAccueil(pygame.Surface):
             #on fait transitionner tous les boutons déjà présents
             for b in self.boutons_entrants:
                 self.boutons[b].transition()
-                print(self.boutons[b].message)
                 self.boutons_sortants.append(b)
             
             #on insère les trois boutons présents dans le menu principal
@@ -120,7 +126,6 @@ class MenuAccueil(pygame.Surface):
                 self.boutons_entrants.append(i)
                 
             self.boutons_entrants = self.boutons_entrants[-3:]
-            print(self.curseur)
 
     def transition_jouer(self):
         if not self.transition_en_cours:
@@ -143,7 +148,6 @@ class MenuAccueil(pygame.Surface):
             #on fait transitionner tous les boutons déjà présents
             for b in self.boutons_entrants:
                 self.boutons[b].transition()
-                print(self.boutons[b].message)
                 self.boutons_sortants.append(b)
             
             #on insère les trois boutons présents dans le menu principal
@@ -152,8 +156,6 @@ class MenuAccueil(pygame.Surface):
                 self.boutons_entrants.append(i)
                 
             self.boutons_entrants = self.boutons_entrants[-2:]
-            
-            print(self.curseur)
     
     def transition_quitter(self):
         if not self.transition_en_cours:
@@ -213,7 +215,6 @@ class MenuAccueil(pygame.Surface):
                     self.transition_menu()
                             
                     
-            
     def update(self):
         for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].update()
@@ -229,6 +230,7 @@ class MenuAccueil(pygame.Surface):
                 self.boutons_sortants.clear()
                 self.transition_en_cours = False
                 if self.boutons_entrants: self.boutons[self.boutons_entrants[0]].selectionne = True
+                if self.page == 3: self.continu = False
     
     def draw(self, surface):
         surface.blit(self, (0, 0))
@@ -236,4 +238,12 @@ class MenuAccueil(pygame.Surface):
         for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].draw(surface)
         
-        #print(self.boutons[0].topleft)
+        #affichage des données de debuggage
+        font = pygame.font.Font(pygame.font.match_font(POLICE), 22)
+        message = font.render("visible = "+("True" if self.boutons[0].visible else "False")+"  desti = "+self.boutons[0].desti(), True, "BLACK")
+        surface.blit(message, (30, 30))
+        message = font.render(
+            str([self.boutons[b].message for b in self.boutons_sortants]) +
+            str([self.boutons[b].message for b in self.boutons_entrants]), True, "BLACK")
+        surface.blit(message, (30, 70))
+        
