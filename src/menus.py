@@ -6,7 +6,7 @@ class Bouton:
     """classe représentant un bouton d'un menu
     """
 
-    def __init__(self, message, coord_visible, coord_cache):
+    def __init__(self, message, coord_visible, coord_cache, couleur="BLACK"):
         self.longueur = 290
         self.largeur = 70
         self.vitesse_deplacement = 11
@@ -26,6 +26,7 @@ class Bouton:
         
         self.selectionne = False
         self.visible = False
+        self.couleur = couleur
     
     def transition(self):
         self.visible = not self.visible
@@ -47,7 +48,7 @@ class Bouton:
             if self.horloge_message % 5 == 0:
                 self.taille_message += (1 if self.grossir_message else -1)
             
-            if self.taille_message == 19 or self.taille_message == 31:
+            if self.taille_message == 17 or self.taille_message == 33:
                 self.grossir_message = not self.grossir_message
         else:
             self.horloge_message = 0
@@ -73,22 +74,49 @@ class Bouton:
     def draw(self, surface):
         #affichage du message
         font = pygame.font.Font(pygame.font.match_font(POLICE), self.taille_message)
-        message = font.render(self.message, True, "BLACK")
+        message = font.render(self.message, True, self.couleur)
         surface.blit(message, (self.topleft[0] + self.longueur //2 - message.get_width() // 2, self.topleft[1] + self.largeur // 2 - message.get_height() // 2))
         
         if self.selectionne:
-            #affichage de l'octogone
+            #affichage du rectangle aux angles rentrés
             coin = self.largeur//4
-            pygame.draw.polygon(surface, "BLACK", [
-                (self.topleft[0]+coin, self.topleft[1]),
-                (self.topleft[0]+self.longueur-coin, self.topleft[1]),
-                (self.topleft[0]+self.longueur, self.topleft[1]+coin),
-                (self.topleft[0]+self.longueur, self.topleft[1]+self.largeur-coin),
-                (self.topleft[0]+self.longueur-coin, self.topleft[1]+self.largeur),
-                (self.topleft[0]+coin, self.topleft[1]+self.largeur),
-                (self.topleft[0], self.topleft[1]+self.largeur-coin),
-                (self.topleft[0], self.topleft[1]+coin)
-            ], 5)
+            
+            pygame.draw.circle(
+                surface, self.couleur, (self.topleft[0], self.topleft[1]),
+                coin, width=5, draw_bottom_right=True)
+            pygame.draw.circle(
+                surface, self.couleur, (self.topleft[0]+self.longueur, self.topleft[1]),
+                coin, width=5, draw_bottom_left=True)
+            pygame.draw.circle(
+                surface, self.couleur, (self.topleft[0]+self.longueur, self.topleft[1]+self.largeur),
+                coin, width=5, draw_top_left=True)
+            pygame.draw.circle(
+                surface, self.couleur, (self.topleft[0], self.topleft[1]+self.largeur),
+                coin, width=5, draw_top_right=True)
+            
+            pygame.draw.line(surface, self.couleur,
+                (self.topleft[0]+coin, self.topleft[1]+2), (self.topleft[0]+self.longueur-coin, self.topleft[1]+2), 5)
+            pygame.draw.line(surface, self.couleur,
+                (self.topleft[0]+self.longueur-2, self.topleft[1]+coin), (self.topleft[0]+self.longueur-2, self.topleft[1]+self.largeur-coin), 5)
+            pygame.draw.line(surface, self.couleur,
+                (self.topleft[0]+self.longueur-coin, self.topleft[1]+self.largeur-2), (self.topleft[0]+coin, self.topleft[1]+self.largeur-2), 5)
+            pygame.draw.line(surface, self.couleur,
+                (self.topleft[0]+2, self.topleft[1]+self.largeur-coin), (self.topleft[0]+2, self.topleft[1]+coin), 5)
+
+            #affichage des quatre petits cercles
+            pygame.draw.circle(
+                surface, self.couleur, (self.topleft[0]-self.taille_message//2 +9, self.topleft[1]-self.taille_message//2 +9),
+                coin//3, width=0)
+            pygame.draw.circle(
+                surface, self.couleur, (self.topleft[0]+self.longueur+self.taille_message//2 -9, self.topleft[1]-self.taille_message//2 +9),
+                coin//3, width=0)
+            pygame.draw.circle(
+                surface, self.couleur, (self.topleft[0]+self.longueur+self.taille_message//2 -9, self.topleft[1]+self.largeur+self.taille_message//2 -9),
+                coin//3, width=0)
+            pygame.draw.circle(
+                surface, self.couleur, (self.topleft[0]-self.taille_message//2 +9, self.topleft[1]+self.largeur+self.taille_message//2 -9),
+                coin//3, width=0)
+            
         else:
             #affichage du rectangle
             pygame.draw.rect(surface, 'BLACK', pygame.Rect(self.topleft, (self.longueur, self.largeur)), 5, 20)
