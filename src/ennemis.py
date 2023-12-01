@@ -2,7 +2,7 @@ import pygame
 from random import randint
 from constantes import *
 from bonus import Bonus
-from projectile import Projectile
+from Projectile import Projectile
 
 
 class Ennemi(pygame.sprite.Sprite):

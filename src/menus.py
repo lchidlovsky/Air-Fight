@@ -1,6 +1,6 @@
 import pygame
 from constantes import *
-from bouton import Bouton
+from Bouton import Bouton
 
 class MenuAccueil(pygame.Surface):
     """classe représentant le menu principal du jeu
