@@ -81,7 +81,7 @@ class SessionJeu(pygame.Surface):
     def draw(self, surface):
         surface.blit(self, (0, 0))
         
-        self.joueur.update
+        self.joueur.update()
         self.vague.update()
         self.vague.draw(surface)
         self.joueur.projectiles.draw(surface)
@@ -93,7 +93,3 @@ class SessionJeu(pygame.Surface):
         
         for b in self.boutons:
             self.boutons[b].draw(surface)
-            
-        print(self.visibilite)
-
-        
