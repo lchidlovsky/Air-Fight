@@ -1,8 +1,8 @@
 import pygame
 from constantes import *
-from bonus import Bonus
+from Bonus import Bonus
 from ennemis import *
-from projectile import Projectile
+from Projectile import Projectile
 from random import randint, choice
 
 class Vague:
@@ -12,7 +12,7 @@ class Vague:
                  nb_petits, nb_moyens, nb_gros,
                  nb_coeurs, nb_munitions, nb_explosifs, nb_vitesses, nb_feux):
         self.nom = nom
-        self.fini = False
+        self.finie = False
         self.largeur_min = coord_min[0]
         self.hauteur_min = coord_min[1]
         self.largeur_max = coord_max[0]
@@ -62,11 +62,11 @@ class Vague:
         bonus_aleatoire = choice(self.bonus.sprites())
         self.bonus.remove(bonus_aleatoire)
         
-        if self.coordonnee : self.coordonnee.pop()
-        x = randint(20, self.largeur_max-80)
-        while x // 20 * 20 in self.coordonnee:
-            x = randint(20, self.largeur_max-80)
-        self.coordonnee.append(x)
+        if len(self.coordonnee) > self.nb_simultanes : self.coordonnee.pop(0)
+        x = randint(50, self.largeur_max-50)
+        while x // 60 * 60 in self.coordonnee:
+            x = randint(50, self.largeur_max-50)
+        self.coordonnee.append(x // 60 * 60)
         
         bonus_aleatoire.rect.midbottom = (x, self.hauteur_min)
         self.bonus_visibles.add(bonus_aleatoire)
@@ -75,7 +75,7 @@ class Vague:
     def placement_ennemi(self):
         """méthode de placement aléatoire des nouveaux ennemis à l'écran
         """
-        if not randint(0, 4//4) and self.bonus: self.placement_bonus()
+        if not randint(0, 3) and self.bonus: self.placement_bonus()
         
         if self.nb_visibles < self.nb_simultanes and self.ennemis:
             self.nb_visibles += 1
@@ -88,13 +88,13 @@ class Vague:
                 ennemi_aleatoire.preparation = False
                 ennemi_aleatoire.tir = False
             
-            if self.coordonnee : self.coordonnee.pop()
-            x = randint(20, self.largeur_max-80)
-            while x // 20 * 20 in self.coordonnee:
-                x = randint(20, self.largeur_max-80)
-            self.coordonnee.append(x)
+            if len(self.coordonnee) > self.nb_simultanes : self.coordonnee.pop(0)
+            x = randint(50, self.largeur_max-50)
+            while x // 70 * 70 in self.coordonnee:
+                x = randint(50, self.largeur_max-50)
+            self.coordonnee.append(x // 70 * 70)
                 
-            ennemi_aleatoire.rect.midbottom = (x, randint(self.hauteur_min-111, self.hauteur_min))
+            ennemi_aleatoire.rect.midbottom = (x, randint(self.hauteur_min-222, self.hauteur_min))
             if isinstance(ennemi_aleatoire, Gros):
                 ennemi_aleatoire.dep_gauche = x > self.largeur_max // 2
             self.ennemis_visibles.add(ennemi_aleatoire)
@@ -110,6 +110,8 @@ class Vague:
                 e.touche(e.vie)
         self.joueur.explosion = False
         
+        if not self.ennemis and not self.ennemis_visibles and not self.bonus_visibles:
+            self.finie = True
         
         for b in self.bonus_visibles:
             

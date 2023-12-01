@@ -1,7 +1,7 @@
 import pygame
 from random import randint
 from constantes import *
-from bonus import Bonus
+from Bonus import Bonus
 from Projectile import Projectile
 
 
