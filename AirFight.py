@@ -167,6 +167,10 @@ while visible.continu:
     visible.update()
     visible.draw(screen)
     
+    
+    if isinstance(visible, MenuAccueil) and visible.passage_jeu:
+        visible = SessionJeu((SCREEN_WIDTH, SCREEN_HEIGHT))
+    
     pygame.display.flip()       #mise à jour de l'affichage
     
     continue

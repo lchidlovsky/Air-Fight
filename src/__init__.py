@@ -1,5 +1,6 @@
 from projectile import *
 from constantes import *
+from session import *
 from ennemis import *
 from gamebar import *
 from joueur import *
