@@ -12,6 +12,7 @@ class Vague:
                  nb_petits, nb_moyens, nb_gros,
                  nb_coeurs, nb_munitions, nb_explosifs, nb_vitesses, nb_feux):
         self.nom = nom
+        self.fini = False
         self.largeur_min = coord_min[0]
         self.hauteur_min = coord_min[1]
         self.largeur_max = coord_max[0]

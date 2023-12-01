@@ -9,7 +9,6 @@ from src import *
 def gestion_controles():
     """fonction gérant les actions du joueur
     """
-    global jeu_lance
     global vaisseau_joueur
     global utilisation_clavier
     global manette
@@ -20,7 +19,8 @@ def gestion_controles():
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-                jeu_lance = False
+                #jeu_lance = False
+                visible.continu = False
         
         if event.type == pygame.JOYDEVICEADDED:     #si une manette est branchée
             pygame.joystick.init()
@@ -41,14 +41,17 @@ def gestion_controles():
             if event.type == pygame.KEYDOWN:
                 if event.key == K_UP:
                     dep_haut = True
+                    visible.haut()
                 if event.key == K_DOWN:
                     dep_bas = True
+                    visible.bas()
                 if event.key == K_LEFT:
                     dep_gauche = True
                 if event.key == K_RIGHT:
                     dep_droit = True
                 if event.key == K_SPACE:
                     tirer = True
+                    visible.selection()
 
                 if event.key == K_RETURN:
                     vaisseau_joueur.explosion_generale()
@@ -73,6 +76,7 @@ def gestion_controles():
             if event.type == pygame.JOYBUTTONDOWN:
                 if event.button == conf_bouttons['A']:
                     tirer = True
+                    visible.selection()
                 if event.button == conf_bouttons['Y']:
                     vaisseau_joueur.explosion_generale()
 
@@ -83,24 +87,25 @@ def gestion_controles():
                 if event.button == conf_bouttons['LB']: vaisseau_joueur.amelioration_puissance_feu()
                 if event.button == conf_bouttons['RB']: w = not w
 
-
-            #gestion du joystick gauche de la manette
-            if manette.get_axis(1) < - 0.2:
-                dep_haut = True
-            else:
-                dep_haut = False
-            if manette.get_axis(1) > 0.2:
-                dep_bas = True
-            else:
-                dep_bas = False
-            if manette.get_axis(0) < - 0.2:
-                dep_gauche = True
-            else:
-                dep_gauche = False
-            if manette.get_axis(0) > 0.2:
-                dep_droit = True
-            else:
-                dep_droit = False
+            if event.type == pygame.JOYAXISMOTION:      #gestion du joystick gauche de la manette
+                if manette.get_axis(1) < - 0.3:
+                    dep_haut = True
+                    visible.haut()
+                else:
+                    dep_haut = False
+                if manette.get_axis(1) > 0.3:
+                    dep_bas = True
+                    visible.bas()
+                else:
+                    dep_bas = False
+                if manette.get_axis(0) < - 0.3:
+                    dep_gauche = True
+                else:
+                    dep_gauche = False
+                if manette.get_axis(0) > 0.3:
+                    dep_droit = True
+                else:
+                    dep_droit = False
                          
     if dep_haut: vaisseau_joueur.haut()
     if dep_bas: vaisseau_joueur.bas()
@@ -113,8 +118,8 @@ def gestion_controles():
 #mise en place de la fenêtre de jeu
 pygame.init()
 screen = pygame.display.set_mode()
-SCREEN_HEIGHT = int(screen.get_height() * 0.8)
-SCREEN_WIDTH = int(screen.get_width() * 0.8)
+SCREEN_HEIGHT = int(screen.get_height() * 0.88)
+SCREEN_WIDTH = int(screen.get_width() * 0.88)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(nom_du_jeu)
 
@@ -141,10 +146,17 @@ v = Vague("vague de test", coord_min=(0, header.get_height()), coord_max=(SCREEN
           nb_coeurs=6, nb_munitions=2, nb_explosifs=3, nb_vitesses=3, nb_feux=2)
 
 
+
+
+menu = MenuAccueil((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+visible = menu
+
 w = True
 
-jeu_lance = True
-while jeu_lance:
+while visible.continu:
+#jeu_lance = True
+#while jeu_lance:
     clock.tick(FPS)
     
     gestion_controles()
@@ -152,6 +164,17 @@ while jeu_lance:
     screen.fill((222, 222, 222))
     
     
+    visible.update()
+    visible.draw(screen)
+    
+    
+    if isinstance(visible, MenuAccueil) and visible.passage_jeu:
+        visible = SessionJeu((SCREEN_WIDTH, SCREEN_HEIGHT))
+    
+    pygame.display.flip()       #mise à jour de l'affichage
+    
+    continue
+
     #mise à jour des entités
     vaisseau_joueur.update()
     if w: v.update()
@@ -163,7 +186,9 @@ while jeu_lance:
     header.draw(screen)
     
     
-    pygame.display.flip()       #mise à jour de l'affichage
+    
+    
+    
             
 
 print("Merci d'avoir joué !")

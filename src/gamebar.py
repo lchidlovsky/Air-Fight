@@ -1,4 +1,5 @@
 import pygame
+from constantes import *
 
 class gameBar(pygame.Surface):
     """classe représentant la barre d'informations durant la partie
@@ -9,7 +10,7 @@ class gameBar(pygame.Surface):
        
         self.joueur = joueur
         
-        self.font = pygame.font.Font(pygame.font.match_font('comicsans'), 29)
+        self.font = pygame.font.Font(pygame.font.match_font(POLICE), 29)
         
         self.coeur = pygame.image.load("images/autres/coeur.png").convert_alpha()
         self.demi = pygame.image.load("images/autres/demi_coeur.png").convert_alpha()
@@ -55,4 +56,3 @@ class gameBar(pygame.Surface):
             
             pos -= self.duplication.get_width() + 20
             surface.blit(self.duplication, (pos, self.get_height() // 2 - self.duplication.get_height() // 2))
-        
