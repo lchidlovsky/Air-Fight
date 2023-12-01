@@ -32,13 +32,7 @@ class SessionJeu(pygame.Surface):
         self.nb_explosifs = 0
         self.nb_feux = 0
         self.nb_vitesses = 0
-        self.vague = Vague("vague n°"+str(self.num_vague),
-                        coord_min=(0, self.header.get_height()), coord_max=(self.longueur_max, self.hauteur_max),
-                        joueur=self.joueur, nb_simultanes=self.visibles,
-                        nb_petits=self.nb_petits, nb_moyens=self.nb_moyens, nb_gros=self.nb_gros,
-                        nb_coeurs=self.nb_coeurs, nb_munitions=self.nb_munitions, nb_explosifs=self.nb_explosifs,
-                        nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
-         
+        self.vague = None
         self.boutons = []
         #    Bouton("REPRENDRE", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40)),
         #    Bouton("MUSIQUE : OUI", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190)),
@@ -52,43 +46,58 @@ class SessionJeu(pygame.Surface):
         self.transition_en_cours = True
         
         self.ecran_noir = pygame.Surface((self.longueur_max, self.hauteur_max))
-        self.visibilite = 0
+        self.ecran_noir.set_alpha(255)
     
     def lancement(self):
         self.transition_en_cours = False
-        self.page = 2
-        self.visibilite = 255
+        self.page = 0
+        self.vague = Vague("vague n°"+str(self.num_vague),
+                        coord_min=(0, self.header.get_height()), coord_max=(self.longueur_max, self.hauteur_max),
+                        joueur=self.joueur, nb_simultanes=self.visibles,
+                        nb_petits=self.nb_petits, nb_moyens=self.nb_moyens, nb_gros=self.nb_gros,
+                        nb_coeurs=self.nb_coeurs, nb_munitions=self.nb_munitions, nb_explosifs=self.nb_explosifs,
+                        nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
     
     def haut(self):
-        pass
+        if self.page == 0:
+            self.joueur.haut()
     
     def bas(self):
-        pass
+        if self.page == 0:
+            self.joueur.bas()
+        
+    def gauche(self):
+        if self.page == 0:
+            self.joueur.gauche()
     
-    def selection(self):
-        pass
+    def droite(self):
+        if self.page == 0:
+            self.joueur.droite()
+        
+    def a_presse(self):
+        if self.page == 0:
+            self.joueur.tirer()
     
     
     
     def update(self):
         #effet d'apparition en fondu
         if self.page == -1:
-            if self.visibilite < 255:
-                self.visibilite += 3
+            if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 0:
+                self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) - 3)
             else:
                 self.lancement()
+        else:
+            self.joueur.update()
+            self.vague.update()
     
     def draw(self, surface):
         surface.blit(self, (0, 0))
-        
-        self.joueur.update()
-        self.vague.update()
-        self.vague.draw(surface)
+        if self.vague: self.vague.draw(surface)
         self.joueur.projectiles.draw(surface)
         surface.blit(self.joueur.image, self.joueur.rect.topleft)
         self.header.draw(surface)
         
-        self.ecran_noir.set_alpha(255-self.visibilite)
         surface.blit(self.ecran_noir, (0, 0))
         
         for b in self.boutons:

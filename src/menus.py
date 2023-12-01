@@ -131,8 +131,8 @@ class MenuAccueil(pygame.Surface):
                 self.curseur += 1
                 self.boutons[self.curseur].selectionne = True
                         
-    def selection(self):
-        if not self.transition_en_cours:
+    def a_presse(self):
+        if not self.transition_en_cours and self.page in [0, 2]:
             match self.curseur:
                 case 0:
                     self.transition_jouer()

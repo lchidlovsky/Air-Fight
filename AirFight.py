@@ -13,105 +13,95 @@ def gestion_controles():
     global utilisation_clavier
     global manette
     global conf_bouttons
-    global dep_haut, dep_bas, dep_gauche, dep_droit
-    global tirer
-    global w
+    global haut_enclenche, bas_enclenche, gauche_enclenche, droite_enclenche
+    global a_presse
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-                #jeu_lance = False
                 visible.continu = False
         
         if event.type == pygame.JOYDEVICEADDED:     #si une manette est branchée
             pygame.joystick.init()
             manette = pygame.joystick.Joystick(event.device_index)
             utilisation_clavier = False
-            dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
-            tirer = False
+            haut_enclenche, bas_enclenche, gauche_enclenche, droite_enclenche = False, False, False, False
+            a_presse = False
             print("\nPassage en mode manette !\n")
             
         if event.type == pygame.JOYDEVICEREMOVED:   #si la manette est débranchée
             utilisation_clavier = True
-            dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
-            tirer = False
+            haut_enclenche, bas_enclenche, gauche_enclenche, droite_enclenche = False, False, False, False
+            a_presse = False
             print("\nPassage en mode clavier !\n")
         
         if utilisation_clavier:     #si le joueur utilise le clavier
         
             if event.type == pygame.KEYDOWN:
                 if event.key == K_UP:
-                    dep_haut = True
-                    visible.haut()
+                    haut_enclenche = True
                 if event.key == K_DOWN:
-                    dep_bas = True
-                    visible.bas()
+                    bas_enclenche = True
                 if event.key == K_LEFT:
-                    dep_gauche = True
+                    gauche_enclenche = True
                 if event.key == K_RIGHT:
-                    dep_droit = True
+                    droite_enclenche = True
                 if event.key == K_SPACE:
-                    tirer = True
-                    visible.selection()
-
-                if event.key == K_RETURN:
-                    vaisseau_joueur.explosion_generale()
-                
-                if event.key == K_BACKSPACE: vaisseau_joueur.amelioration_puissance_feu()
+                    a_presse = True
+                if isinstance(visible, SessionJeu):
+                    if event.key == K_RETURN:
+                        visible.y_presse()
                 
                     
             if event.type == pygame.KEYUP:
                 if event.key == K_UP:
-                    dep_haut = False
+                    haut_enclenche = False
                 if event.key == K_DOWN:
-                    dep_bas = False
+                    bas_enclenche = False
                 if event.key == K_LEFT:
-                    dep_gauche = False
+                    gauche_enclenche = False
                 if event.key == K_RIGHT:
-                    dep_droit = False
+                    droite_enclenche = False
                 if event.key == K_SPACE:
-                    tirer = False
+                    a_presse = False
                     
         else:       #si le joueur utilise la manette
 
             if event.type == pygame.JOYBUTTONDOWN:
                 if event.button == conf_bouttons['A']:
-                    tirer = True
-                    visible.selection()
-                if event.button == conf_bouttons['Y']:
-                    vaisseau_joueur.explosion_generale()
+                    a_presse = True
+                if isinstance(visible, SessionJeu):
+                    if event.button == conf_bouttons['Y']:
+                        visible.y_presse()
 
             if event.type == pygame.JOYBUTTONUP:
                 if event.button == conf_bouttons['A']:
-                    tirer = False
-                
-                if event.button == conf_bouttons['LB']: vaisseau_joueur.amelioration_puissance_feu()
-                if event.button == conf_bouttons['RB']: w = not w
+                    a_presse = False
+
 
             if event.type == pygame.JOYAXISMOTION:      #gestion du joystick gauche de la manette
                 if manette.get_axis(1) < - 0.3:
-                    dep_haut = True
-                    visible.haut()
+                    haut_enclenche = True
                 else:
-                    dep_haut = False
+                    haut_enclenche = False
                 if manette.get_axis(1) > 0.3:
-                    dep_bas = True
-                    visible.bas()
+                    bas_enclenche = True
                 else:
-                    dep_bas = False
+                    bas_enclenche = False
                 if manette.get_axis(0) < - 0.3:
-                    dep_gauche = True
+                    gauche_enclenche = True
                 else:
-                    dep_gauche = False
+                    gauche_enclenche = False
                 if manette.get_axis(0) > 0.3:
-                    dep_droit = True
+                    droite_enclenche = True
                 else:
-                    dep_droit = False
-                         
-    if dep_haut: vaisseau_joueur.haut()
-    if dep_bas: vaisseau_joueur.bas()
-    if dep_gauche: vaisseau_joueur.gauche()
-    if dep_droit: vaisseau_joueur.droite()
-    if tirer: vaisseau_joueur.tirer()
+                    droite_enclenche = False
+    
+    if a_presse: visible.a_presse()
+    if haut_enclenche: visible.haut()
+    if bas_enclenche: visible.bas()
+    if isinstance(visible, SessionJeu):
+        if gauche_enclenche: visible.gauche()
+        if droite_enclenche: visible.droite()
 
 
 
@@ -132,8 +122,8 @@ conf_bouttons = conf_xbox
 
 
 #variable d'action du vaisseau
-dep_haut, dep_bas, dep_gauche, dep_droit = False, False, False, False
-tirer = False
+haut_enclenche, bas_enclenche, gauche_enclenche, droite_enclenche = False, False, False, False
+a_presse = False
 
 
 #création des entités visuelles
@@ -146,17 +136,11 @@ v = Vague("vague de test", coord_min=(0, header.get_height()), coord_max=(SCREEN
           nb_coeurs=6, nb_munitions=2, nb_explosifs=3, nb_vitesses=3, nb_feux=2)
 
 
-
-
 menu = MenuAccueil((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 visible = menu
 
-w = True
-
 while visible.continu:
-#jeu_lance = True
-#while jeu_lance:
     clock.tick(FPS)
     
     gestion_controles()
