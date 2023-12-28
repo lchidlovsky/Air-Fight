@@ -103,7 +103,7 @@ class SessionJeu(pygame.Surface):
         if self.page == 0:
             self.joueur.tirer()
             
-    def y_presse(self):
+    def b_presse(self):
         if self.page == 0:
             self.joueur.explosion_generale()
     

@@ -48,7 +48,7 @@ def gestion_controles():
                     a_presse = True
                 if isinstance(visible, SessionJeu):
                     if event.key == K_RETURN:
-                        visible.y_presse()
+                        visible.b_presse()
                 
                     
             if event.type == pygame.KEYUP:
@@ -69,7 +69,7 @@ def gestion_controles():
                 if event.button == conf_bouttons['A']:
                     a_presse = True
                 if isinstance(visible, SessionJeu):
-                    if event.button == conf_bouttons['Y']:
+                    if event.button == conf_bouttons['B']:
                         visible.y_presse()
 
             if event.type == pygame.JOYBUTTONUP:
@@ -98,17 +98,19 @@ def gestion_controles():
     if a_presse: visible.a_presse()
     if haut_enclenche: visible.haut()
     if bas_enclenche: visible.bas()
-    if isinstance(visible, SessionJeu):
+    try:
         if gauche_enclenche: visible.gauche()
         if droite_enclenche: visible.droite()
+    except:
+        pass
 
 
 
 #mise en place de la fenêtre de jeu
 pygame.init()
 screen = pygame.display.set_mode()
-SCREEN_HEIGHT = int(screen.get_height() * 0.88)
-SCREEN_WIDTH = int(screen.get_width() * 0.88)
+SCREEN_HEIGHT = int(screen.get_height() * TAILLE_FENETRE)
+SCREEN_WIDTH = int(screen.get_width() * TAILLE_FENETRE)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(nom_du_jeu)
 
@@ -118,15 +120,14 @@ clock = pygame.time.Clock()
 utilisation_clavier = True
 manette = None
 conf_bouttons = conf_xbox
+manette_xbox = True
 
 #variations des contrôles
 haut_enclenche, bas_enclenche, gauche_enclenche, droite_enclenche = False, False, False, False
 a_presse = False
 
 
-menu = MenuAccueil((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-visible = menu
+visible = MenuAccueil((SCREEN_WIDTH, SCREEN_HEIGHT), manette_xbox)
 
 while visible.continu:
     clock.tick(FPS)

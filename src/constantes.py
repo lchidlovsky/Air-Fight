@@ -1,6 +1,7 @@
 nom_du_jeu = "Air Fight"
 POLICE = 'comicsans'
 FPS = 60
+TAILLE_FENETRE = 0.88
 
 vie_joueur = 6
 vitesse_joueur = 5

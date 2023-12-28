@@ -5,7 +5,7 @@ from Bouton import Bouton
 class MenuAccueil(pygame.Surface):
     """classe représentant le menu principal du jeu
     """
-    def __init__(self, size):
+    def __init__(self, size, manette_xbox):
         pygame.Surface.__init__(self, size)
         self.fill("WHITE")
         
@@ -15,13 +15,21 @@ class MenuAccueil(pygame.Surface):
         titre = pygame.image.load("images/autres/air-fight.png").convert_alpha()
         self.titre = pygame.transform.scale(titre, (720, 135))
         self.titre.set_alpha(0)
+        self.titre_pos = (self.longueur_max//2 - self.titre.get_width()//2, self.hauteur_max //2 -250 - self.titre.get_height()//2)
+        
+        self.manette = pygame.image.load("images/autres/manette.png").convert_alpha()
+        self.manette.set_alpha(0)
+        self.manette_pos = (self.longueur_max//2 -350 - self.manette.get_width()//2, self.hauteur_max //2 - self.manette.get_height()//2)
+        
+        self.manette_xbox = manette_xbox
         
         self.boutons = [
             Bouton("JOUER", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40)),
             Bouton("OPTIONS", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190)),
             Bouton("QUITTER", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +340)),
-            Bouton("MUSIQUE : OUI", (self.longueur_max //2+280, self.hauteur_max//2-60), (self.longueur_max +150, self.hauteur_max//2-60)),
-            Bouton("RETOUR", (self.longueur_max //2+280, self.hauteur_max//2+60), (self.longueur_max +150, self.hauteur_max//2+60))
+            Bouton("MUSIQUE : OUI", (self.longueur_max //2+280, self.hauteur_max//2-120), (self.longueur_max +150, self.hauteur_max//2-120)),
+            Bouton("MANETTE : XBOX", (self.longueur_max //2+280, self.hauteur_max//2-20), (self.longueur_max +150, self.hauteur_max//2-20)),
+            Bouton("RETOUR", (self.longueur_max //2+280, self.hauteur_max//2+80), (self.longueur_max +150, self.hauteur_max//2+80))
         ]
         self.boutons_entrants = []
         self.boutons_sortants = []
@@ -74,18 +82,19 @@ class MenuAccueil(pygame.Surface):
             self.curseur = 3
             self.page = 2
             self.transition_en_cours = True
+            self.manette.set_alpha(5)
             
             #on fait transitionner tous les boutons déjà présents
             for b in self.boutons_entrants:
                 self.boutons[b].transition()
                 self.boutons_sortants.append(b)
             
-            #on insère les trois boutons présents dans le menu principal
-            for i in range(3, 5):
+            #on insère les trois boutons présents dans le menu d'options
+            for i in range(3, 6):
                 self.boutons[i].transition()
                 self.boutons_entrants.append(i)
                 
-            self.boutons_entrants = self.boutons_entrants[-2:]
+            self.boutons_entrants = self.boutons_entrants[-3:]
     
     def transition_quitter(self):
         if not self.transition_en_cours:
@@ -125,7 +134,7 @@ class MenuAccueil(pygame.Surface):
                 case 0:
                     limite = 2
                 case 2:
-                    limite = 4
+                    limite = 5
             if self.curseur+1 <= limite:
                 self.boutons[self.curseur].selectionne = False
                 self.curseur += 1
@@ -141,13 +150,19 @@ class MenuAccueil(pygame.Surface):
                 case 2:
                     self.transition_quitter()
                 case 3:
-                    #activer/désactiver le son
+                    if self.cooldown == 0:
+                        self.cooldown += 1
+                        #activer/désactiver le son
                     pass
                 case 4:
+                    if self.cooldown == 0:
+                        self.cooldown += 1
+                        #passage manette xbox/ps
+                    pass
+                case 5:
                     self.transition_accueil()
                
     def update(self):
-        
         #effet d'apparition en fondu
         if self.page == -1:
             if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 1:
@@ -156,7 +171,7 @@ class MenuAccueil(pygame.Surface):
                 self.transition_en_cours = False
                 self.transition_accueil()
         
-        if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 254:
+        if self.page == 1 and (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 254:
             self.passage_jeu = True
         
         if self.cooldown: self.cooldown += 1
@@ -182,15 +197,47 @@ class MenuAccueil(pygame.Surface):
                 self.titre.set_alpha((self.titre.get_alpha() if self.titre.get_alpha() else 0) + 5)
             if self.page != 0 and (self.titre.get_alpha() if self.titre.get_alpha() else 0) > 0:
                 self.titre.set_alpha((self.titre.get_alpha() if self.titre.get_alpha() else 0) - 5)
-        else:
+                
+            #on fait apparaitre/disparaitre la manette
+            if self.page == 2 and (self.manette.get_alpha() if self.manette.get_alpha() else 0) < 255:
+                self.manette.set_alpha((self.manette.get_alpha() if self.manette.get_alpha() else 0) + 5)
+            if self.page != 2 and (self.manette.get_alpha() if self.manette.get_alpha() else 0) > 0:
+                self.manette.set_alpha((self.manette.get_alpha() if self.manette.get_alpha() else 0) - 5)
+        else:   #on assombrit l'écran
             if self.page == 1 and 2 < (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0):
                 self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0)+3)
         
     def draw(self, surface):
         surface.blit(self, (0, 0))
-        surface.blit(self.titre, (self.longueur_max//2 - self.titre.get_width()//2, self.hauteur_max //2 -250- self.titre.get_height()//2))
+        surface.blit(self.titre, self.titre_pos)
+        surface.blit(self.manette, self.manette_pos)
         
         for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].draw(surface)
+            
+        #affichages des indications de controles manettes
+        if self.page == 2 and not self.transition_en_cours:
+            font = pygame.font.Font(pygame.font.match_font(POLICE), 25)
+            
+            movement = font.render('Déplacement', True, 'ORANGE')
+            surface.blit(movement, (self.manette_pos[0] - movement.get_width() - 28, self.manette_pos[1] + self.manette.get_height() * 0.51))
+            pygame.draw.line(surface, 'ORANGE',
+                             (self.manette_pos[0] - 20, self.manette_pos[1] + self.manette.get_height() * 0.51 + movement.get_height()//2),
+                             (self.manette_pos[0] + self.manette.get_width() * 0.28, self.manette_pos[1] + self.manette.get_height() * 0.51 + movement.get_height()//2), 4)
+            
+            a = font.render('Tirer', True, 'BLUE')
+            surface.blit(a, (self.manette_pos[0] + self.manette.get_width() + 33, self.manette_pos[1] + self.manette.get_height() * 0.6))
+            pygame.draw.line(surface, 'BLUE',
+                             (self.manette_pos[0] + self.manette.get_width() * 0.83, self.manette_pos[1] + self.manette.get_height() * 0.47),
+                             (self.manette_pos[0] + self.manette.get_width() + 33, self.manette_pos[1] + a.get_height()//2 + self.manette.get_height() * 0.6), 4)
+            
+            surface.blit(pygame.image.load("images/autres/logo_explosif.png").convert_alpha(),
+                         (self.manette_pos[0] + self.manette.get_width() + 40, self.manette_pos[1] + self.manette.get_height() * 0.27))
+            pygame.draw.line(surface, 'RED',
+                             (self.manette_pos[0] + self.manette.get_width() * 0.90, self.manette_pos[1] + self.manette.get_height() * 0.34),
+                             (self.manette_pos[0] + self.manette.get_width() + 33, self.manette_pos[1] + self.manette.get_height() * 0.34), 4)
+            
+            #pygame.draw.circle(surface, 'RED', self.manette_pos, 5, 0)
+            
         
         surface.blit(self.ecran_noir, (0, 0))
