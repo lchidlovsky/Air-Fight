@@ -157,8 +157,12 @@ class MenuAccueil(pygame.Surface):
                 case 4:
                     if self.cooldown == 0:
                         self.cooldown += 1
-                        #passage manette xbox/ps
-                    pass
+                        
+                        self.manette_xbox = not self.manette_xbox
+                        if self.manette_xbox:
+                            self.boutons[4].message = "MANETTE : XBOX"
+                        else:
+                            self.boutons[4].message = "MANETTE : PS"
                 case 5:
                     self.transition_accueil()
                
@@ -219,25 +223,29 @@ class MenuAccueil(pygame.Surface):
         if self.page == 2 and not self.transition_en_cours:
             font = pygame.font.Font(pygame.font.match_font(POLICE), 25)
             
-            movement = font.render('Déplacement', True, 'ORANGE')
+            movement = font.render('Déplacement', True, 'WHITE')
+            pygame.draw.rect(surface, 'ORANGE',
+                             (self.manette_pos[0] - movement.get_width() - 31, self.manette_pos[1] + self.manette.get_height() * 0.51 -3,
+                              movement.get_width()+6, movement.get_height()+6), 0, 10)
             surface.blit(movement, (self.manette_pos[0] - movement.get_width() - 28, self.manette_pos[1] + self.manette.get_height() * 0.51))
             pygame.draw.line(surface, 'ORANGE',
-                             (self.manette_pos[0] - 20, self.manette_pos[1] + self.manette.get_height() * 0.51 + movement.get_height()//2),
+                             (self.manette_pos[0] - 19, self.manette_pos[1] + self.manette.get_height() * 0.51 + movement.get_height()//2),
                              (self.manette_pos[0] + self.manette.get_width() * 0.28, self.manette_pos[1] + self.manette.get_height() * 0.51 + movement.get_height()//2), 4)
             
-            a = font.render('Tirer', True, 'BLUE')
-            surface.blit(a, (self.manette_pos[0] + self.manette.get_width() + 33, self.manette_pos[1] + self.manette.get_height() * 0.6))
+            a = font.render('Tirer', True, 'WHITE')
+            pygame.draw.rect(surface, 'BLUE',
+                             (self.manette_pos[0] + self.manette.get_width() + 41, self.manette_pos[1] + self.manette.get_height() * 0.6 -3,
+                              a.get_width()+6, a.get_height()+6), 0, 10)
+            surface.blit(a, (self.manette_pos[0] + self.manette.get_width() + 44, self.manette_pos[1] + self.manette.get_height() * 0.6))
             pygame.draw.line(surface, 'BLUE',
                              (self.manette_pos[0] + self.manette.get_width() * 0.83, self.manette_pos[1] + self.manette.get_height() * 0.47),
                              (self.manette_pos[0] + self.manette.get_width() + 33, self.manette_pos[1] + a.get_height()//2 + self.manette.get_height() * 0.6), 4)
             
             surface.blit(pygame.image.load("images/autres/logo_explosif.png").convert_alpha(),
-                         (self.manette_pos[0] + self.manette.get_width() + 40, self.manette_pos[1] + self.manette.get_height() * 0.27))
+                         (self.manette_pos[0] + self.manette.get_width() + 58, self.manette_pos[1] + self.manette.get_height() * 0.27))
             pygame.draw.line(surface, 'RED',
                              (self.manette_pos[0] + self.manette.get_width() * 0.90, self.manette_pos[1] + self.manette.get_height() * 0.34),
-                             (self.manette_pos[0] + self.manette.get_width() + 33, self.manette_pos[1] + self.manette.get_height() * 0.34), 4)
-            
-            #pygame.draw.circle(surface, 'RED', self.manette_pos, 5, 0)
+                             (self.manette_pos[0] + self.manette.get_width() + 48, self.manette_pos[1] + self.manette.get_height() * 0.34), 4)
             
         
         surface.blit(self.ecran_noir, (0, 0))

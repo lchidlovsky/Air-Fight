@@ -28,7 +28,7 @@ class SessionJeu(pygame.Surface):
         self.nb_moyens = 2
         self.nb_gros = 0
         self.visibles = 5
-        self.nb_coeurs = 3
+        self.nb_coeurs = 2
         self.nb_munitions = 2
         self.nb_explosifs = 0
         self.nb_feux = 0
@@ -61,18 +61,18 @@ class SessionJeu(pygame.Surface):
                         nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
         
         print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
-                self.nb_coeurs, 'coeurs   ', self.nb_munitions, 'munitions')
+                self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
         
     def nouvelle_vague(self):
         self.num_vague += 1
         self.nb_petits += 3
-        self.nb_moyens += 1 + (1 if not self.num_vague %2 else 0)
+        self.nb_moyens += 2
         self.nb_gros += (1 if not self.num_vague %2 else 0)
         self.visibles += 1
-        self.nb_coeurs += ((1 if not self.num_vague %2 else 0) if self.num_vague < 11 else 2)
-        self.nb_munitions += 1
-        self.nb_explosifs = (1 if not self.num_vague %2 else 0)
-        self.nb_feux = (1 if not self.num_vague %3 else 0)
+        self.nb_coeurs += (1 if not self.num_vague %4 else 0)
+        self.nb_munitions += (3 if self.num_vague < 10 else 1)
+        self.nb_explosifs = ((1 if not self.num_vague %2 else 0) if self.num_vague < 10 else 1)
+        self.nb_feux = (1 if not (self.num_vague+1) %4 else 0)
         self.nb_vitesses = (1 if not self.num_vague %4 else 0)
         self.vague = Vague("VAGUE N°"+str(self.num_vague),
             coord_min=(0, self.header.get_height()), coord_max=(self.longueur_max, self.hauteur_max),
@@ -81,7 +81,7 @@ class SessionJeu(pygame.Surface):
             nb_coeurs=self.nb_coeurs, nb_munitions=self.nb_munitions, nb_explosifs=self.nb_explosifs,
             nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
         print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
-                self.nb_coeurs, 'coeurs   ', self.nb_munitions, 'munitions')
+            self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
     
     def haut(self):
         if self.page == 0:

@@ -11,7 +11,7 @@ def gestion_controles():
     """
     global utilisation_clavier
     global manette
-    global conf_bouttons
+    global conf_manette
     global haut_enclenche, bas_enclenche, gauche_enclenche, droite_enclenche
     global a_presse
     
@@ -66,14 +66,14 @@ def gestion_controles():
         else:       #si le joueur utilise la manette
 
             if event.type == pygame.JOYBUTTONDOWN:
-                if event.button == conf_bouttons['A']:
+                if event.button == conf_manette['A']:
                     a_presse = True
                 if isinstance(visible, SessionJeu):
-                    if event.button == conf_bouttons['B']:
-                        visible.y_presse()
+                    if event.button == conf_manette['B']:
+                        visible.b_presse()
 
             if event.type == pygame.JOYBUTTONUP:
-                if event.button == conf_bouttons['A']:
+                if event.button == conf_manette['A']:
                     a_presse = False
 
 
@@ -101,7 +101,7 @@ def gestion_controles():
     try:
         if gauche_enclenche: visible.gauche()
         if droite_enclenche: visible.droite()
-    except:
+    except AttributeError:
         pass
 
 
@@ -119,7 +119,7 @@ clock = pygame.time.Clock()
 #contrôles du joueurs
 utilisation_clavier = True
 manette = None
-conf_bouttons = conf_xbox
+conf_manette = conf_xbox
 manette_xbox = True
 
 #variations des contrôles
@@ -137,11 +137,20 @@ while visible.continu:
     visible.update()
     visible.draw(screen)
     
+    try:
+        manette_xbox = visible.manette_xbox
+    except AttributeError:
+        pass
+    
     if isinstance(visible, MenuAccueil) and visible.passage_jeu:
         visible = SessionJeu((SCREEN_WIDTH, SCREEN_HEIGHT))
+        
+    if manette_xbox : conf_manette = conf_xbox
+    else: conf_manette = conf_ps
+    
     
     pygame.display.flip()       #mise à jour de l'affichage
 
 
-print("Merci d'avoir joué !")
+print("\nMerci d'avoir joué !")
 pygame.quit()

@@ -21,7 +21,7 @@ class Vague:
         
         self.nb_simultanes = nb_simultanes  #nm max d'ennemis en même temps à l'écran
         self.nb_visibles = 0
-        self.coordonnee = []
+        self.coordonnees = []
         self.ennemis = pygame.sprite.Group()
         self.ennemis_visibles = pygame.sprite.Group()
         self.tirs_ennemis = pygame.sprite.Group()
@@ -55,6 +55,10 @@ class Vague:
             
         for i in range(self.nb_simultanes):
             self.placement_ennemi()
+            
+    def coordonnees_pop(self):
+        if self.coordonnees :
+            self.coordonnees.pop(0)
 
     def placement_bonus(self):
         """méthode de placement aléatoire de bonus à l'écran
@@ -62,11 +66,12 @@ class Vague:
         bonus_aleatoire = choice(self.bonus.sprites())
         self.bonus.remove(bonus_aleatoire)
         
-        if len(self.coordonnee) > self.nb_simultanes : self.coordonnee.pop(0)
-        x = randint(50, self.largeur_max-50)
-        while x // 60 * 60 in self.coordonnee:
+        if len(self.coordonnees) >= self.nb_simultanes : self.coordonnees_pop()
+        for _ in range(100):
             x = randint(50, self.largeur_max-50)
-        self.coordonnee.append(x // 60 * 60)
+            if x // 60 * 60 not in self.coordonnees:
+                break
+        self.coordonnees.append(x // 60 * 60)
         
         bonus_aleatoire.rect.midbottom = (x, self.hauteur_min)
         self.bonus_visibles.add(bonus_aleatoire)
@@ -75,7 +80,7 @@ class Vague:
     def placement_ennemi(self):
         """méthode de placement aléatoire des nouveaux ennemis à l'écran
         """
-        if not randint(0, 3) and self.bonus: self.placement_bonus()
+        if not randint(0, 4) and self.bonus: self.placement_bonus()
         
         if self.nb_visibles < self.nb_simultanes and self.ennemis:
             self.nb_visibles += 1
@@ -88,13 +93,14 @@ class Vague:
                 ennemi_aleatoire.preparation = False
                 ennemi_aleatoire.tir = False
             
-            if len(self.coordonnee) > self.nb_simultanes : self.coordonnee.pop(0)
-            x = randint(50, self.largeur_max-50)
-            while x // 70 * 70 in self.coordonnee:
+            if len(self.coordonnees) >= self.nb_simultanes : self.coordonnees_pop()
+            for _ in range(100):
                 x = randint(50, self.largeur_max-50)
-            self.coordonnee.append(x // 70 * 70)
+                while x // 60 * 60 in self.coordonnees:
+                    break
+            self.coordonnees.append(x // 60 * 60)
                 
-            ennemi_aleatoire.rect.midbottom = (x, randint(self.hauteur_min-222, self.hauteur_min))
+            ennemi_aleatoire.rect.midbottom = (x, randint(self.hauteur_min-333, self.hauteur_min))
             if isinstance(ennemi_aleatoire, Gros):
                 ennemi_aleatoire.dep_gauche = x > self.largeur_max // 2
             self.ennemis_visibles.add(ennemi_aleatoire)
@@ -115,7 +121,7 @@ class Vague:
         
         for b in self.bonus_visibles:
             
-            #replacement des ennemis arrivés en bas
+            #replacement des bonus arrivés en bas
             if b.rect.top > self.hauteur_max:
                 self.bonus_visibles.remove(b)
                 self.bonus.add(b)
@@ -123,6 +129,7 @@ class Vague:
             #récupération du bonus par le joueur
             if b.rect.colliderect(self.joueur) and self.joueur.animation != 3:
                 self.bonus_visibles.remove(b)
+                self.coordonnees_pop()
                 match b.type:
                     case 'coeur':
                         self.joueur.vie +=2
@@ -147,6 +154,7 @@ class Vague:
                 self.nb_visibles -= 1
                 self.ennemis.add(e)
                 self.placement_ennemi()
+                self.coordonnees_pop()
             
             #ajout des tirs ennemis
             if not isinstance(e, Petit):
@@ -158,8 +166,9 @@ class Vague:
             if e.vivant and not e.est_touche and self.joueur.animation == 1 and e.rect.colliderect(self.joueur):
                 self.joueur.touche(e.vie)
                 e.touche(e.vie)
+                self.coordonnees_pop()
                 
-            #suppression des ennemis touchés
+            #impact des ennemis touchés
             for p in self.joueur.projectiles:
                 if e.vivant and p.rect.colliderect(e):
                     self.joueur.projectiles.remove(p)
@@ -170,6 +179,7 @@ class Vague:
                 self.ennemis_visibles.remove(e)
                 self.nb_visibles -= 1
                 self.placement_ennemi()
+                self.coordonnees_pop()
         
         for p in self.tirs_ennemis:
             if p.rect.colliderect(self.joueur) and self.joueur.animation ==1:

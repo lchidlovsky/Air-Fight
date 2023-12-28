@@ -10,14 +10,14 @@ chargeur_joueur = 30
 
 vitesse_bonus = 2
 
-vie_petit = 2
+vie_petit = 3
 vitesse_petit = 3
 
-vie_moyen = 3
+vie_moyen = 5
 vitesse_moyen = 2
 vitesse_projectile_moyen = 6
 
-vie_gros = 5
+vie_gros = 8
 vitesse_gros = 1
 vitesse_laterale_gros = 1
 vitesse_laser_gros = 20

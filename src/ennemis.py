@@ -28,15 +28,14 @@ class Ennemi(pygame.sprite.Sprite):
         self.rect.top += vitesse
         
     def touche(self, degat):
-        if not self.est_touche:
-            self.est_touche = True
-            self.vie -= degat
-            self.horloge_apparence = 0
-            if self.vie < 1:
-                self.vie = 0
-                self.vivant = False
-                self.num_apparence = 1
-                self.image = self.apparences[1]
+        self.est_touche = True
+        self.vie -= degat
+        self.horloge_apparence = 0
+        if self.vie < 1:
+            self.vie = 0
+            self.vivant = False
+            self.num_apparence = 1
+            self.image = self.apparences[1]
             
     
     def update(self):
