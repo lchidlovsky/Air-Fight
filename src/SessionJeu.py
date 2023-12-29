@@ -38,7 +38,9 @@ class SessionJeu(pygame.Surface):
         self.boutons = [
             Bouton("REPRENDRE", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40), 'WHITE'),
             Bouton("MUSIQUE : OUI", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190), 'WHITE'),
-            Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +340), 'WHITE')
+            Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +340), 'WHITE'),
+            Bouton("RECOMMENCER", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40), 'WHITE'),
+            Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190), 'WHITE')
         ]
         self.boutons_entrants = []
         self.boutons_sortants = []
@@ -91,11 +93,43 @@ class SessionJeu(pygame.Surface):
         if not self.transition_en_cours:
             if self.page == 0:
                 self.joueur.haut()
+                
+            elif self.page == 1 and self.cooldown == 0:
+                self.cooldown = 1
+                limite = 0
+                
+                match self.page:
+                    case 1:
+                        limite = 0
+                    
+                    case 2:
+                        limite = 3
+                        
+                if self.curseur-1 >= limite:
+                    self.boutons[self.curseur].selectionne = False
+                    self.curseur -= 1
+                    self.boutons[self.curseur].selectionne = True
         
     def bas(self):
         if not self.transition_en_cours:
             if self.page == 0:
                 self.joueur.bas()
+                
+            elif self.page == 1 and self.cooldown == 0:
+                self.cooldown = 1
+                limite = 0
+                
+                match self.page:
+                    case 1:
+                        limite = 2
+                    
+                    case 2:
+                        limite = 4
+                        
+                if self.curseur+1 <= limite:
+                    self.boutons[self.curseur].selectionne = False
+                    self.curseur += 1
+                    self.boutons[self.curseur].selectionne = True
             
     def gauche(self):
         if not self.transition_en_cours:
