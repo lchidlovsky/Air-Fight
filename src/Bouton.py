@@ -34,11 +34,6 @@ class Bouton:
     def en_place(self):
         return self.topleft == (self.coord_visible if self.visible==True else self.coord_cache)
     
-    def desti(self):
-        if self.visible:
-            return "coord_visible"
-        return "coord_cache"
-    
     def update(self):
         #gestion de la taille du message
         if self.selectionne:

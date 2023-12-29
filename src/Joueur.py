@@ -1,6 +1,6 @@
 import pygame
 from constantes import *
-from projectile import Projectile
+from Projectile import Projectile
 
 class Joueur(pygame.sprite.Sprite):
     """classe représentant le vaisseau du joueur
