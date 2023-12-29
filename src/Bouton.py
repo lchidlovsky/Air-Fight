@@ -113,4 +113,4 @@ class Bouton:
             
         else:
             #affichage du rectangle
-            pygame.draw.rect(surface, 'BLACK', pygame.Rect(self.topleft, (self.longueur, self.largeur)), 5, 20)
+            pygame.draw.rect(surface, self.couleur, pygame.Rect(self.topleft, (self.longueur, self.largeur)), 5, 20)

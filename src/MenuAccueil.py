@@ -207,6 +207,7 @@ class MenuAccueil(pygame.Surface):
                 self.manette.set_alpha((self.manette.get_alpha() if self.manette.get_alpha() else 0) + 5)
             if self.page != 2 and (self.manette.get_alpha() if self.manette.get_alpha() else 0) > 0:
                 self.manette.set_alpha((self.manette.get_alpha() if self.manette.get_alpha() else 0) - 5)
+        
         else:   #on assombrit l'écran
             if self.page == 1 and 2 < (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0):
                 self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0)+3)
