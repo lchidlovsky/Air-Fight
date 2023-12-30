@@ -1,6 +1,6 @@
 import pygame
 from math import log
-from menus import *
+from MenuAccueil import *
 from Vague import *
 from constantes import *
 from Bouton import Bouton
@@ -35,11 +35,16 @@ class SessionJeu(pygame.Surface):
         self.nb_vitesses = 0
         self.num_vague = 1
         self.vague = None
-        self.boutons = []
-        #    Bouton("REPRENDRE", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40)),
-        #    Bouton("MUSIQUE : OUI", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190)),
-        #    Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +340))
-        #]
+        self.boutons = [
+            Bouton("REPRENDRE", (self.longueur_max //2, self.hauteur_max//2 -70), (self.longueur_max //2, self.hauteur_max+40), 'WHITE'),
+            Bouton("MUSIQUE : OUI", (self.longueur_max //2, self.hauteur_max//2 +30), (self.longueur_max //2, self.hauteur_max +190), 'WHITE'),
+            Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +130), (self.longueur_max //2, self.hauteur_max +340), 'WHITE'),
+            Bouton("RECOMMENCER", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40), 'WHITE'),
+            Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190), 'WHITE')
+        ]
+        self.boutons_entrants = []
+        self.boutons_sortants = []
+        
         self.continu = True
         self.passage_menu = False
         self.curseur = 0
@@ -83,56 +88,204 @@ class SessionJeu(pygame.Surface):
         print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
             self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
     
+    
     def haut(self):
-        if self.page == 0:
-            self.joueur.haut()
-    
+        if not self.transition_en_cours:
+            if self.page == 0:
+                self.joueur.haut()
+                
+            elif self.page == 1 and self.cooldown == 0:
+                self.cooldown = 1
+                limite = 0
+                
+                match self.page:
+                    case 1:
+                        limite = 0
+                    
+                    case 2:
+                        limite = 3
+                        
+                if self.curseur-1 >= limite:
+                    self.boutons[self.curseur].selectionne = False
+                    self.curseur -= 1
+                    self.boutons[self.curseur].selectionne = True
+        
     def bas(self):
-        if self.page == 0:
-            self.joueur.bas()
-        
-    def gauche(self):
-        if self.page == 0:
-            self.joueur.gauche()
-    
-    def droite(self):
-        if self.page == 0:
-            self.joueur.droite()
-        
-    def a_presse(self):
-        if self.page == 0:
-            self.joueur.tirer()
+        if not self.transition_en_cours:
+            if self.page == 0:
+                self.joueur.bas()
+                
+            elif self.page == 1 and self.cooldown == 0:
+                self.cooldown = 1
+                limite = 0
+                
+                match self.page:
+                    case 1:
+                        limite = 2
+                    
+                    case 2:
+                        limite = 4
+                        
+                if self.curseur+1 <= limite:
+                    self.boutons[self.curseur].selectionne = False
+                    self.curseur += 1
+                    self.boutons[self.curseur].selectionne = True
             
+    def gauche(self):
+        if not self.transition_en_cours:
+            if self.page == 0:
+                self.joueur.gauche()
+        
+    def droite(self):
+        if not self.transition_en_cours:
+            if self.page == 0:
+                self.joueur.droite()
+            
+    def a_presse(self):
+        if not self.transition_en_cours:
+            if self.page == 0:
+                self.joueur.tirer()
+            
+            if self.page in [1, 3]:
+                match self.curseur:
+                    case 0:
+                        self.transition_jeu()
+                    case 1:
+                        if self.cooldown == 0:
+                            self.cooldown += 1
+                            #activer/désactiver le son
+                        pass
+                    case 2:
+                        self.transition_menu_principal()
+                    case 3:
+                        #recommencer la partie
+                        pass
+                    case 4:
+                        self.passage_menu = True
+                
     def b_presse(self):
-        if self.page == 0:
-            self.joueur.explosion_generale()
+        if not self.transition_en_cours:
+            if self.page == 0:
+                self.joueur.explosion_generale()
+                
+    def menu_presse(self):
+        if not self.transition_en_cours and self.cooldown == 0:
+            self.cooldown = 1
+            
+            #transition du jeu au menu de pause
+            if self.page == 0:
+                self.transition_menu_pause()
+            #retour au jeu
+            elif self.page == 1:
+                self.transition_jeu()
+                
     
+    def transition_menu_pause(self):
+        self.curseur = 0
+        self.transition_en_cours = True
+        self.page = 1
+        
+        #on insère les trois boutons présents dans le menu de pause
+        for i in range(3):
+            self.boutons[i].transition()
+            self.boutons_entrants.append(i)
+            
+        self.boutons_entrants = self.boutons_entrants[-3:]
+    
+    def transition_jeu(self):
+        self.transition_en_cours = True
+        self.page = 0
+        
+        #on fait transitionner tous les boutons déjà présents
+        for b in self.boutons_entrants:
+            self.boutons[b].transition()
+            self.boutons_sortants.append(b)
+        self.boutons_entrants.clear()
+        
+    def transition_menu_principal(self):
+        self.curseur = 0
+        self.transition_en_cours = True
+        self.page = 2
+        
+        #on fait transitionner tous les boutons déjà présents
+        for b in self.boutons_entrants:
+            self.boutons[b].transition()
+            self.boutons_sortants.append(b)
+        self.boutons_entrants.clear()
     
     def update(self):
-        #effet d'apparition en fondu
-        if self.page == -1:
-            if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 0:
-                self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) - 3)
-            else:
-                self.lancement()
+        
+        if self.cooldown: self.cooldown += 1
+        if self.cooldown > 18 : self.cooldown = 0
+        for b in self.boutons_sortants + self.boutons_entrants:
+            self.boutons[b].update()
+        
+        if self.transition_en_cours:
+            
+            #on fait diparaitre tous les boutons venant de sortir de l'écran
+            disparition = True
+            for b in self.boutons_sortants + self.boutons_entrants:
+                if not self.boutons[b].en_place():
+                    disparition = False
+                    break
+            if disparition:
+                self.boutons_sortants.clear()
+                if self.boutons_entrants: self.boutons[self.boutons_entrants[0]].selectionne = True
+            
+            match self.page:
+                
+                #effet d'apparition en fondu
+                case -1:
+                    if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 0:
+                        self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) - 3)
+                    else:
+                        self.lancement()
+                    
+                case 0:
+                    if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 0:
+                        self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) - 3)
+                    elif disparition:
+                        self.transition_en_cours = False
+                        
+                case 1:
+                    if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) < 201:
+                        self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 3)
+                    elif disparition:
+                        self.transition_en_cours = False
+                
+                case 2:
+                    self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 1)
+                    if disparition and (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) == 255:
+                        self.passage_menu = True
+                    
+                
+                
         else:
-            self.joueur.update()
-            self.vague.update()
-            if self.vague.finie:
-                self.nouvelle_vague()
+            
+            if self.page == 0:
+                self.joueur.update()
+                self.vague.update()
+                if self.vague.finie:
+                    self.nouvelle_vague()
                 
     
     def draw(self, surface):
         surface.blit(self, (0, 0))
+        
+        #on fait apparaître les ennemis
         if self.page != -1: self.vague.draw(surface)
+        
+        #on fait apparaître le joueur et ses tirs
         self.joueur.projectiles.draw(surface)
         surface.blit(self.joueur.image, self.joueur.rect.topleft)
+        
+        #on fait apparaître la barre d'informations
         if self.page == -1:
             self.header.draw(surface)
         else:
             self.header.draw(surface, self.vague.nom)
         
-        surface.blit(self.ecran_noir, (0, 0))
+        surface.blit(self.ecran_noir, ((0, 0) if self.page in [-1, 2] else (0, self.header.get_height())))
         
-        for b in self.boutons:
+        for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].draw(surface)

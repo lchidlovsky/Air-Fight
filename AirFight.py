@@ -71,6 +71,8 @@ def gestion_controles():
                 if isinstance(visible, SessionJeu):
                     if event.button == conf_manette['B']:
                         visible.b_presse()
+                    if event.button == conf_manette['MENU']:
+                        visible.menu_presse()
 
             if event.type == pygame.JOYBUTTONUP:
                 if event.button == conf_manette['A']:
@@ -137,17 +139,17 @@ while visible.continu:
     visible.update()
     visible.draw(screen)
     
-    try:
-        manette_xbox = visible.manette_xbox
-    except AttributeError:
-        pass
+            
+    if isinstance(visible, SessionJeu) and visible.passage_menu:
+        visible = MenuAccueil((SCREEN_WIDTH, SCREEN_HEIGHT), manette_xbox)
     
-    if isinstance(visible, MenuAccueil) and visible.passage_jeu:
-        visible = SessionJeu((SCREEN_WIDTH, SCREEN_HEIGHT))
-        
+    if isinstance(visible, MenuAccueil):
+        manette_xbox = visible.manette_xbox
+        if visible.passage_jeu:
+            visible = SessionJeu((SCREEN_WIDTH, SCREEN_HEIGHT))
+    
     if manette_xbox : conf_manette = conf_xbox
     else: conf_manette = conf_ps
-    
     
     pygame.display.flip()       #mise à jour de l'affichage
 

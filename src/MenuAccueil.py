@@ -19,7 +19,7 @@ class MenuAccueil(pygame.Surface):
         
         self.manette = pygame.image.load("images/autres/manette.png").convert_alpha()
         self.manette.set_alpha(0)
-        self.manette_pos = (self.longueur_max//2 -350 - self.manette.get_width()//2, self.hauteur_max //2 - self.manette.get_height()//2)
+        self.manette_pos = (self.longueur_max//2 -310 - self.manette.get_width()//2, self.hauteur_max //2 - self.manette.get_height()//2)
         
         self.manette_xbox = manette_xbox
         
@@ -27,9 +27,9 @@ class MenuAccueil(pygame.Surface):
             Bouton("JOUER", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40)),
             Bouton("OPTIONS", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190)),
             Bouton("QUITTER", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +340)),
-            Bouton("MUSIQUE : OUI", (self.longueur_max //2+280, self.hauteur_max//2-120), (self.longueur_max +150, self.hauteur_max//2-120)),
-            Bouton("MANETTE : XBOX", (self.longueur_max //2+280, self.hauteur_max//2-20), (self.longueur_max +150, self.hauteur_max//2-20)),
-            Bouton("RETOUR", (self.longueur_max //2+280, self.hauteur_max//2+80), (self.longueur_max +150, self.hauteur_max//2+80))
+            Bouton("MUSIQUE : OUI", (self.longueur_max //2+320, self.hauteur_max//2-120), (self.longueur_max +150, self.hauteur_max//2-120)),
+            Bouton("MANETTE : XBOX", (self.longueur_max //2+320, self.hauteur_max//2-20), (self.longueur_max +150, self.hauteur_max//2-20)),
+            Bouton("RETOUR", (self.longueur_max //2+320, self.hauteur_max//2+80), (self.longueur_max +150, self.hauteur_max//2+80))
         ]
         self.boutons_entrants = []
         self.boutons_sortants = []
@@ -207,6 +207,7 @@ class MenuAccueil(pygame.Surface):
                 self.manette.set_alpha((self.manette.get_alpha() if self.manette.get_alpha() else 0) + 5)
             if self.page != 2 and (self.manette.get_alpha() if self.manette.get_alpha() else 0) > 0:
                 self.manette.set_alpha((self.manette.get_alpha() if self.manette.get_alpha() else 0) - 5)
+        
         else:   #on assombrit l'écran
             if self.page == 1 and 2 < (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0):
                 self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0)+3)
@@ -225,11 +226,11 @@ class MenuAccueil(pygame.Surface):
             
             movement = font.render('Déplacement', True, 'WHITE')
             pygame.draw.rect(surface, 'ORANGE',
-                             (self.manette_pos[0] - movement.get_width() - 31, self.manette_pos[1] + self.manette.get_height() * 0.51 -3,
+                             (self.manette_pos[0] - movement.get_width() - 50, self.manette_pos[1] + self.manette.get_height() * 0.51 -3,
                               movement.get_width()+6, movement.get_height()+6), 0, 10)
-            surface.blit(movement, (self.manette_pos[0] - movement.get_width() - 28, self.manette_pos[1] + self.manette.get_height() * 0.51))
+            surface.blit(movement, (self.manette_pos[0] - movement.get_width() - 47, self.manette_pos[1] + self.manette.get_height() * 0.51))
             pygame.draw.line(surface, 'ORANGE',
-                             (self.manette_pos[0] - 19, self.manette_pos[1] + self.manette.get_height() * 0.51 + movement.get_height()//2),
+                             (self.manette_pos[0] - 33, self.manette_pos[1] + self.manette.get_height() * 0.51 + movement.get_height()//2),
                              (self.manette_pos[0] + self.manette.get_width() * 0.28, self.manette_pos[1] + self.manette.get_height() * 0.51 + movement.get_height()//2), 4)
             
             a = font.render('Tirer', True, 'WHITE')
