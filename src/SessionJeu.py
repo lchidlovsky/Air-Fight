@@ -135,11 +135,30 @@ class SessionJeu(pygame.Surface):
         if not self.transition_en_cours:
             if self.page == 0:
                 self.joueur.gauche()
+                
+            elif self.page == 3 and self.cooldown == 0:
+                self.cooldown = 1
+                limite = 3
+                        
+                if self.curseur-1 >= limite:
+                    self.boutons[self.curseur].selectionne = False
+                    self.curseur -= 1
+                    self.boutons[self.curseur].selectionne = True
         
     def droite(self):
         if not self.transition_en_cours:
             if self.page == 0:
                 self.joueur.droite()
+            
+            elif self.page == 3 and self.cooldown == 0:
+                self.cooldown = 1
+                limite = 4
+                        
+                if self.curseur+1 <= limite:
+                    self.boutons[self.curseur].selectionne = False
+                    self.curseur += 1
+                    self.boutons[self.curseur].selectionne = True
+                        
             
     def a_presse(self):
         if not self.transition_en_cours:
@@ -158,10 +177,11 @@ class SessionJeu(pygame.Surface):
                     case 2:
                         self.transition_menu_principal()
                     case 3:
-                        #recommencer la partie
+                        self.recommencement()
                         pass
                     case 4:
-                        self.passage_menu = True
+                        self.transition_menu_principal()
+                    
                 
     def b_presse(self):
         if not self.transition_en_cours:
@@ -189,8 +209,6 @@ class SessionJeu(pygame.Surface):
         for i in range(3):
             self.boutons[i].transition()
             self.boutons_entrants.append(i)
-            
-        self.boutons_entrants = self.boutons_entrants[-3:]
     
     def transition_jeu(self):
         self.transition_en_cours = True
@@ -207,7 +225,27 @@ class SessionJeu(pygame.Surface):
         self.transition_en_cours = True
         self.page = 2
         
-        #on fait transitionner tous les boutons déjà présents
+        #on fait transitionner tous les boutons présents
+        for b in self.boutons_entrants:
+            self.boutons[b].transition()
+            self.boutons_sortants.append(b)
+        self.boutons_entrants.clear()
+        
+    def transition_gameover(self):
+        self.curseur = 3
+        self.transition_en_cours = True
+        self.page = 3
+        
+        #on insère les trois boutons présents dans le menu de pause
+        for i in range(3, 5):
+            self.boutons[i].transition()
+            self.boutons_entrants.append(i)
+        
+    def recommencement(self):
+        self.transition_en_cours = True
+        self.page = 4
+        
+        #on fait transitionner tous les boutons présents
         for b in self.boutons_entrants:
             self.boutons[b].transition()
             self.boutons_sortants.append(b)
@@ -257,16 +295,26 @@ class SessionJeu(pygame.Surface):
                     self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 1)
                     if disparition and (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) == 255:
                         self.passage_menu = True
-                    
+                        
+                case 3:
+                    if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) < 202:
+                        self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 2)
+                    elif disparition:
+                        self.transition_en_cours = False
+                        
+                case 4:
+                    if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) < 201:
+                        self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 3)
+                    elif disparition:
+                        self = SessionJeu((self.longueur_max, self.hauteur_max))
                 
+        elif self.page in [0, 3, 4]:
+            self.joueur.update()
+            self.vague.update()
+            if self.vague.finie:
+                self.nouvelle_vague()
                 
-        else:
-            
-            if self.page == 0:
-                self.joueur.update()
-                self.vague.update()
-                if self.vague.finie:
-                    self.nouvelle_vague()
+        if self.joueur.est_mort() and self.page == 0: self.transition_gameover()
                 
     
     def draw(self, surface):
