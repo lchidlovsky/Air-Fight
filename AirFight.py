@@ -139,17 +139,17 @@ while visible.continu:
     visible.update()
     visible.draw(screen)
     
-    try:
+            
+    if isinstance(visible, SessionJeu) and visible.passage_menu:
+        visible = MenuAccueil((SCREEN_WIDTH, SCREEN_HEIGHT), manette_xbox)
+    
+    if isinstance(visible, MenuAccueil):
         manette_xbox = visible.manette_xbox
-    except AttributeError:
-        pass
+        if visible.passage_jeu:
+            visible = SessionJeu((SCREEN_WIDTH, SCREEN_HEIGHT))
     
     if manette_xbox : conf_manette = conf_xbox
     else: conf_manette = conf_ps
-    
-    if isinstance(visible, MenuAccueil) and visible.passage_jeu:
-        visible = SessionJeu((SCREEN_WIDTH, SCREEN_HEIGHT))
-    
     
     pygame.display.flip()       #mise à jour de l'affichage
 

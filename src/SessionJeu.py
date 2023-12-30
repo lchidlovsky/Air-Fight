@@ -36,9 +36,9 @@ class SessionJeu(pygame.Surface):
         self.num_vague = 1
         self.vague = None
         self.boutons = [
-            Bouton("REPRENDRE", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40), 'WHITE'),
-            Bouton("MUSIQUE : OUI", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190), 'WHITE'),
-            Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +340), 'WHITE'),
+            Bouton("REPRENDRE", (self.longueur_max //2, self.hauteur_max//2 -70), (self.longueur_max //2, self.hauteur_max+40), 'WHITE'),
+            Bouton("MUSIQUE : OUI", (self.longueur_max //2, self.hauteur_max//2 +30), (self.longueur_max //2, self.hauteur_max +190), 'WHITE'),
+            Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +130), (self.longueur_max //2, self.hauteur_max +340), 'WHITE'),
             Bouton("RECOMMENCER", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40), 'WHITE'),
             Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190), 'WHITE')
         ]
@@ -145,6 +145,23 @@ class SessionJeu(pygame.Surface):
         if not self.transition_en_cours:
             if self.page == 0:
                 self.joueur.tirer()
+            
+            if self.page in [1, 3]:
+                match self.curseur:
+                    case 0:
+                        self.transition_jeu()
+                    case 1:
+                        if self.cooldown == 0:
+                            self.cooldown += 1
+                            #activer/désactiver le son
+                        pass
+                    case 2:
+                        self.transition_menu_principal()
+                    case 3:
+                        #recommencer la partie
+                        pass
+                    case 4:
+                        self.passage_menu = True
                 
     def b_presse(self):
         if not self.transition_en_cours:
@@ -160,7 +177,7 @@ class SessionJeu(pygame.Surface):
                 self.transition_menu_pause()
             #retour au jeu
             elif self.page == 1:
-                self.retour_au_jeu()
+                self.transition_jeu()
                 
     
     def transition_menu_pause(self):
@@ -175,9 +192,20 @@ class SessionJeu(pygame.Surface):
             
         self.boutons_entrants = self.boutons_entrants[-3:]
     
-    def retour_au_jeu(self):
+    def transition_jeu(self):
         self.transition_en_cours = True
         self.page = 0
+        
+        #on fait transitionner tous les boutons déjà présents
+        for b in self.boutons_entrants:
+            self.boutons[b].transition()
+            self.boutons_sortants.append(b)
+        self.boutons_entrants.clear()
+        
+    def transition_menu_principal(self):
+        self.curseur = 0
+        self.transition_en_cours = True
+        self.page = 2
         
         #on fait transitionner tous les boutons déjà présents
         for b in self.boutons_entrants:
@@ -203,25 +231,33 @@ class SessionJeu(pygame.Surface):
             if disparition:
                 self.boutons_sortants.clear()
                 if self.boutons_entrants: self.boutons[self.boutons_entrants[0]].selectionne = True
-
-            #effet d'apparition en fondu
-            if self.page == -1:
-                if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 0:
-                    self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) - 3)
-                else:
-                    self.lancement()
+            
+            match self.page:
                 
-            if self.page == 0:
-                if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 0:
-                    self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) - 3)
-                elif disparition:
-                    self.transition_en_cours = False
+                #effet d'apparition en fondu
+                case -1:
+                    if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 0:
+                        self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) - 3)
+                    else:
+                        self.lancement()
                     
-            if self.page == 1:
-                if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) < 231:
-                    self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 3)
-                elif disparition:
-                    self.transition_en_cours = False
+                case 0:
+                    if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) > 0:
+                        self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) - 3)
+                    elif disparition:
+                        self.transition_en_cours = False
+                        
+                case 1:
+                    if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) < 201:
+                        self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 3)
+                    elif disparition:
+                        self.transition_en_cours = False
+                
+                case 2:
+                    self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 1)
+                    if disparition and (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) == 255:
+                        self.passage_menu = True
+                    
                 
                 
         else:
@@ -249,7 +285,7 @@ class SessionJeu(pygame.Surface):
         else:
             self.header.draw(surface, self.vague.nom)
         
-        surface.blit(self.ecran_noir, ((0, 0) if self.page == -1 else (0, self.header.get_height())))
+        surface.blit(self.ecran_noir, ((0, 0) if self.page in [-1, 2] else (0, self.header.get_height())))
         
         for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].draw(surface)
