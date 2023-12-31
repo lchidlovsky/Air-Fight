@@ -39,8 +39,8 @@ class SessionJeu(pygame.Surface):
             Bouton("REPRENDRE", (self.longueur_max //2, self.hauteur_max//2 -70), (self.longueur_max //2, self.hauteur_max+40), 'WHITE'),
             Bouton("MUSIQUE : OUI", (self.longueur_max //2, self.hauteur_max//2 +30), (self.longueur_max //2, self.hauteur_max +190), 'WHITE'),
             Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +130), (self.longueur_max //2, self.hauteur_max +340), 'WHITE'),
-            Bouton("RECOMMENCER", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40), 'WHITE'),
-            Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190), 'WHITE')
+            Bouton("RECOMMENCER", (self.longueur_max //2 -200, self.hauteur_max //2 +100), (-100, self.hauteur_max //2 +100), 'WHITE'),
+            Bouton("MENU PRINCIPAL", (self.longueur_max //2 +200, self.hauteur_max //2 +100), (self.longueur_max+100, self.hauteur_max //2 +100), 'WHITE')
         ]
         self.boutons_entrants = []
         self.boutons_sortants = []
@@ -87,8 +87,7 @@ class SessionJeu(pygame.Surface):
             nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
         print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
             self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
-    
-    
+     
     def haut(self):
         if not self.transition_en_cours:
             if self.page == 0:
@@ -158,8 +157,7 @@ class SessionJeu(pygame.Surface):
                     self.boutons[self.curseur].selectionne = False
                     self.curseur += 1
                     self.boutons[self.curseur].selectionne = True
-                        
-            
+           
     def a_presse(self):
         if not self.transition_en_cours:
             if self.page == 0:
@@ -181,8 +179,7 @@ class SessionJeu(pygame.Surface):
                         pass
                     case 4:
                         self.transition_menu_principal()
-                    
-                
+    
     def b_presse(self):
         if not self.transition_en_cours:
             if self.page == 0:
@@ -198,7 +195,6 @@ class SessionJeu(pygame.Surface):
             #retour au jeu
             elif self.page == 1:
                 self.transition_jeu()
-                
     
     def transition_menu_pause(self):
         self.curseur = 0
@@ -297,31 +293,27 @@ class SessionJeu(pygame.Surface):
                         self.passage_menu = True
                         
                 case 3:
+                    self.vague.update()
                     if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) < 202:
                         self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 2)
                     elif disparition:
                         self.transition_en_cours = False
                         
                 case 4:
-                    if (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) < 201:
-                        self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 3)
-                    elif disparition:
-                        self = SessionJeu((self.longueur_max, self.hauteur_max))
+                    self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 1)
+                    if disparition and (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) == 255:
+                        self.__init__((self.longueur_max, self.hauteur_max))
                 
-        elif self.page in [0, 3, 4]:
+        elif self.page in [0, 3]:
             self.joueur.update()
             self.vague.update()
             if self.vague.finie:
                 self.nouvelle_vague()
                 
         if self.joueur.est_mort() and self.page == 0: self.transition_gameover()
-                
     
     def draw(self, surface):
         surface.blit(self, (0, 0))
-        
-        #on fait apparaître les ennemis
-        if self.page != -1: self.vague.draw(surface)
         
         #on fait apparaître le joueur et ses tirs
         self.joueur.projectiles.draw(surface)
@@ -331,9 +323,15 @@ class SessionJeu(pygame.Surface):
         if self.page == -1:
             self.header.draw(surface)
         else:
+            self.vague.draw(surface)
             self.header.draw(surface, self.vague.nom)
         
-        surface.blit(self.ecran_noir, ((0, 0) if self.page in [-1, 2] else (0, self.header.get_height())))
+        surface.blit(self.ecran_noir, ((0, 0) if self.page in [-1, 2, 4] else (0, self.header.get_height())))
+        
+        if self.page == 3:
+            font = pygame.font.Font(pygame.font.match_font(POLICE), 120)
+            gameover = font.render('GAME OVER', True, 'WHITE')
+            surface.blit(gameover, (self.longueur_max //2 - gameover.get_width()//2, self.hauteur_max //2 -100 - gameover.get_height()//2))
         
         for b in self.boutons_sortants + self.boutons_entrants:
             self.boutons[b].draw(surface)
