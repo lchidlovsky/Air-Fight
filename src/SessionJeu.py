@@ -65,14 +65,14 @@ class SessionJeu(pygame.Surface):
                         nb_coeurs=self.nb_coeurs, nb_munitions=self.nb_munitions, nb_explosifs=self.nb_explosifs,
                         nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
         
-        print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
-                self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
+        #print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
+        #        self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
         
     def nouvelle_vague(self):
         self.num_vague += 1
         self.nb_petits += 3
         self.nb_moyens += 2
-        self.nb_gros += (1 if not self.num_vague %2 else 0)
+        self.nb_gros += ((1 if not self.num_vague %2 else 0) if self.num_vague > 3 else 0)
         self.visibles += 1
         self.nb_coeurs += (1 if not self.num_vague %4 else 0)
         self.nb_munitions += (3 if self.num_vague < 10 else 1)
@@ -85,8 +85,8 @@ class SessionJeu(pygame.Surface):
             nb_petits=self.nb_petits, nb_moyens=self.nb_moyens, nb_gros=self.nb_gros,
             nb_coeurs=self.nb_coeurs, nb_munitions=self.nb_munitions, nb_explosifs=self.nb_explosifs,
             nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
-        print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
-            self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
+        #print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
+        #    self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
      
     def haut(self):
         if not self.transition_en_cours:

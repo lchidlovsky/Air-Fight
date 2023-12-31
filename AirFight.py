@@ -49,7 +49,8 @@ def gestion_controles():
                 if isinstance(visible, SessionJeu):
                     if event.key == K_RETURN:
                         visible.b_presse()
-                
+                    if event.key == K_p:
+                        visible.menu_presse()
                     
             if event.type == pygame.KEYUP:
                 if event.key == K_UP:
