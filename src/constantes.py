@@ -6,7 +6,7 @@ TAILLE_FENETRE = 0.88
 vie_joueur = 6
 vitesse_joueur = 5
 vitesse_projectile_joueur = 12
-chargeur_joueur = 30
+chargeur_joueur = 50
 
 vitesse_bonus = 2
 

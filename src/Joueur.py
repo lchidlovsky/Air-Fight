@@ -35,6 +35,9 @@ class Joueur(pygame.sprite.Sprite):
         self.explosifs = 0
         self.explosion = False
         self.duplications = 0
+    
+    def est_mort(self):
+        return self.num_apparence == 6
 
     def haut(self):
         if self.animation != 3 and self.rect.top - self.vitesse >= self.hauteur_min:
@@ -88,7 +91,6 @@ class Joueur(pygame.sprite.Sprite):
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +60, self.rect.top +20), vitesse_projectile_joueur, 0))
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +80, self.rect.top +44), vitesse_projectile_joueur, 0))
 
-
     def touche(self, degat):
         if self.animation == 1:
             self.vie -= degat
@@ -102,8 +104,6 @@ class Joueur(pygame.sprite.Sprite):
             else:
                 self.animation = 2
 
-
-    
     def update(self):
         #animation des projectiles tirés
         self.projectiles.update()
