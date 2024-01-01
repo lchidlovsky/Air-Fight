@@ -6,6 +6,7 @@ from constantes import *
 from Bouton import Bouton
 from Joueur import Joueur
 from GameBar import GameBar
+from MixerAudio import MixerAudio
 
 class SessionJeu(pygame.Surface):
     """classe représentant une session de jeu
@@ -109,6 +110,8 @@ class SessionJeu(pygame.Surface):
                     self.boutons[self.curseur].selectionne = False
                     self.curseur -= 1
                     self.boutons[self.curseur].selectionne = True
+                    
+                    if self.gestion.son_active: MixerAudio.suivant()
         
     def bas(self):
         if not self.transition_en_cours:
@@ -130,6 +133,8 @@ class SessionJeu(pygame.Surface):
                     self.boutons[self.curseur].selectionne = False
                     self.curseur += 1
                     self.boutons[self.curseur].selectionne = True
+                    
+                    if self.gestion.son_active: MixerAudio.suivant()
             
     def gauche(self):
         if not self.transition_en_cours:
@@ -144,6 +149,8 @@ class SessionJeu(pygame.Surface):
                     self.boutons[self.curseur].selectionne = False
                     self.curseur -= 1
                     self.boutons[self.curseur].selectionne = True
+                    
+                    if self.gestion.son_active: MixerAudio.suivant()
         
     def droite(self):
         if not self.transition_en_cours:
@@ -158,6 +165,8 @@ class SessionJeu(pygame.Surface):
                     self.boutons[self.curseur].selectionne = False
                     self.curseur += 1
                     self.boutons[self.curseur].selectionne = True
+                    
+                    if self.gestion.son_active: MixerAudio.suivant()
            
     def a_presse(self):
         if not self.transition_en_cours:
@@ -168,6 +177,7 @@ class SessionJeu(pygame.Surface):
                 match self.curseur:
                     case 0:
                         self.transition_jeu()
+                        if self.gestion.son_active: MixerAudio.entree()
                     case 1:
                         if self.cooldown == 0:
                             self.cooldown += 1
@@ -177,14 +187,17 @@ class SessionJeu(pygame.Surface):
                                 self.boutons[1].message = "MUSIQUE : OUI"
                             else:
                                 self.boutons[1].message = "MUSIQUE : NON"
-                        pass
+                                
+                            if self.gestion.son_active: MixerAudio.ok()
                     case 2:
                         self.transition_menu_principal()
+                        if self.gestion.son_active: MixerAudio.entree()
                     case 3:
                         self.recommencement()
-                        pass
+                        if self.gestion.son_active: MixerAudio.entree()
                     case 4:
                         self.transition_menu_principal()
+                        if self.gestion.son_active: MixerAudio.entree()
     
     def b_presse(self):
         if not self.transition_en_cours:
@@ -308,7 +321,7 @@ class SessionJeu(pygame.Surface):
                 case 4:
                     self.ecran_noir.set_alpha((self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) + 1)
                     if disparition and (self.ecran_noir.get_alpha() if self.ecran_noir.get_alpha() else 0) == 255:
-                        self.__init__((self.longueur_max, self.hauteur_max))
+                        self.__init__((self.longueur_max, self.hauteur_max), self.gestion)
                 
         elif self.page in [0, 3]:
             self.joueur.update()

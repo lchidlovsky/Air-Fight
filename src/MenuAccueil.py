@@ -1,6 +1,7 @@
 import pygame
 from constantes import *
 from Bouton import Bouton
+from MixerAudio import MixerAudio
 
 class MenuAccueil(pygame.Surface):
     """classe représentant le menu principal du jeu
@@ -124,6 +125,8 @@ class MenuAccueil(pygame.Surface):
                 self.boutons[self.curseur].selectionne = False
                 self.curseur -= 1
                 self.boutons[self.curseur].selectionne = True
+                
+                if self.gestion.son_active: MixerAudio.suivant()
     
     def bas(self):
         if not self.transition_en_cours and self.cooldown == 0:
@@ -139,16 +142,21 @@ class MenuAccueil(pygame.Surface):
                 self.boutons[self.curseur].selectionne = False
                 self.curseur += 1
                 self.boutons[self.curseur].selectionne = True
+                
+                if self.gestion.son_active: MixerAudio.suivant()
                         
     def a_presse(self):
         if not self.transition_en_cours and self.page in [0, 2]:
             match self.curseur:
                 case 0:
                     self.transition_jouer()
+                    if self.gestion.son_active: MixerAudio.entree()
                 case 1:
                     self.transition_options()
+                    if self.gestion.son_active: MixerAudio.ok()
                 case 2:
                     self.transition_quitter()
+                    if self.gestion.son_active: MixerAudio.ok()
                 case 3:
                     if self.cooldown == 0:
                         self.cooldown += 1
@@ -158,6 +166,8 @@ class MenuAccueil(pygame.Surface):
                             self.boutons[3].message = "MUSIQUE : OUI"
                         else:
                             self.boutons[3].message = "MUSIQUE : NON"
+                            
+                        if self.gestion.son_active: MixerAudio.ok()
                 case 4:
                     if self.cooldown == 0:
                         self.cooldown += 1
@@ -167,8 +177,12 @@ class MenuAccueil(pygame.Surface):
                             self.boutons[4].message = "MANETTE : XBOX"
                         else:
                             self.boutons[4].message = "MANETTE : PS"
+                            
+                        if self.gestion.son_active: MixerAudio.ok()
                 case 5:
                     self.transition_accueil()
+                            
+                    if self.gestion.son_active: MixerAudio.ok()
                
     def update(self):
         #effet d'apparition en fondu
