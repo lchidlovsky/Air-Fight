@@ -11,7 +11,7 @@ class SessionJeu(pygame.Surface):
     """classe représentant une session de jeu
     """
     
-    def __init__(self, size):
+    def __init__(self, size, gestion):
         pygame.Surface.__init__(self, size)
         self.fill("WHITE")
     
@@ -23,6 +23,7 @@ class SessionJeu(pygame.Surface):
         self.joueur = Joueur((self.longueur_max //2, self.hauteur_max * 0.8),
                              (0, self.header.get_height()), (self.longueur_max, self.hauteur_max), vie_joueur)
         self.header.joueur = self.joueur
+        self.gestion = gestion
         
         self.nb_petits = 5
         self.nb_moyens = 2
@@ -37,7 +38,7 @@ class SessionJeu(pygame.Surface):
         self.vague = None
         self.boutons = [
             Bouton("REPRENDRE", (self.longueur_max //2, self.hauteur_max//2 -70), (self.longueur_max //2, self.hauteur_max+40), 'WHITE'),
-            Bouton("MUSIQUE : OUI", (self.longueur_max //2, self.hauteur_max//2 +30), (self.longueur_max //2, self.hauteur_max +190), 'WHITE'),
+            Bouton(("MUSIQUE : OUI" if self.gestion.son_active else "MUSIQUE : NON"), (self.longueur_max //2, self.hauteur_max//2 +30), (self.longueur_max //2, self.hauteur_max +190), 'WHITE'),
             Bouton("MENU PRINCIPAL", (self.longueur_max //2, self.hauteur_max //2 +130), (self.longueur_max //2, self.hauteur_max +340), 'WHITE'),
             Bouton("RECOMMENCER", (self.longueur_max //2 -200, self.hauteur_max //2 +100), (-100, self.hauteur_max //2 +100), 'WHITE'),
             Bouton("MENU PRINCIPAL", (self.longueur_max //2 +200, self.hauteur_max //2 +100), (self.longueur_max+100, self.hauteur_max //2 +100), 'WHITE')
@@ -170,7 +171,12 @@ class SessionJeu(pygame.Surface):
                     case 1:
                         if self.cooldown == 0:
                             self.cooldown += 1
-                            #activer/désactiver le son
+                            
+                            self.gestion.son_active = not self.gestion.son_active
+                            if self.gestion.son_active:
+                                self.boutons[1].message = "MUSIQUE : OUI"
+                            else:
+                                self.boutons[1].message = "MUSIQUE : NON"
                         pass
                     case 2:
                         self.transition_menu_principal()

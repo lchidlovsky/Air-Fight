@@ -5,7 +5,7 @@ from Bouton import Bouton
 class MenuAccueil(pygame.Surface):
     """classe représentant le menu principal du jeu
     """
-    def __init__(self, size, manette_xbox):
+    def __init__(self, size, gestion):
         pygame.Surface.__init__(self, size)
         self.fill("WHITE")
         
@@ -21,14 +21,14 @@ class MenuAccueil(pygame.Surface):
         self.manette.set_alpha(0)
         self.manette_pos = (self.longueur_max//2 -310 - self.manette.get_width()//2, self.hauteur_max //2 - self.manette.get_height()//2)
         
-        self.manette_xbox = manette_xbox
+        self.gestion = gestion
         
         self.boutons = [
             Bouton("JOUER", (self.longueur_max //2, self.hauteur_max //2), (self.longueur_max //2, self.hauteur_max+40)),
             Bouton("OPTIONS", (self.longueur_max //2, self.hauteur_max //2 +100), (self.longueur_max //2, self.hauteur_max +190)),
             Bouton("QUITTER", (self.longueur_max //2, self.hauteur_max //2 +200), (self.longueur_max //2, self.hauteur_max +340)),
-            Bouton("MUSIQUE : OUI", (self.longueur_max //2+320, self.hauteur_max//2-120), (self.longueur_max +150, self.hauteur_max//2-120)),
-            Bouton("MANETTE : XBOX", (self.longueur_max //2+320, self.hauteur_max//2-20), (self.longueur_max +150, self.hauteur_max//2-20)),
+            Bouton(("MUSIQUE : OUI" if self.gestion.son_active else "MUSIQUE : NON"), (self.longueur_max //2+320, self.hauteur_max//2-120), (self.longueur_max +150, self.hauteur_max//2-120)),
+            Bouton(("MANETTE : XBOX" if self.gestion.manette_xbox else "MANETTE : PS"), (self.longueur_max //2+320, self.hauteur_max//2-20), (self.longueur_max +150, self.hauteur_max//2-20)),
             Bouton("RETOUR", (self.longueur_max //2+320, self.hauteur_max//2+80), (self.longueur_max +150, self.hauteur_max//2+80))
         ]
         self.boutons_entrants = []
@@ -152,14 +152,18 @@ class MenuAccueil(pygame.Surface):
                 case 3:
                     if self.cooldown == 0:
                         self.cooldown += 1
-                        #activer/désactiver le son
-                    pass
+                        
+                        self.gestion.son_active = not self.gestion.son_active
+                        if self.gestion.son_active:
+                            self.boutons[3].message = "MUSIQUE : OUI"
+                        else:
+                            self.boutons[3].message = "MUSIQUE : NON"
                 case 4:
                     if self.cooldown == 0:
                         self.cooldown += 1
                         
-                        self.manette_xbox = not self.manette_xbox
-                        if self.manette_xbox:
+                        self.gestion.manette_xbox = not self.gestion.manette_xbox
+                        if self.gestion.manette_xbox:
                             self.boutons[4].message = "MANETTE : XBOX"
                         else:
                             self.boutons[4].message = "MANETTE : PS"
