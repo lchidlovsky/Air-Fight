@@ -46,11 +46,15 @@ def gestion_controles():
                     droite_enclenche = True
                 if event.key == K_SPACE:
                     a_presse = True
-                if isinstance(visible, SessionJeu):
+                try:
                     if event.key == K_RETURN:
                         visible.b_presse()
                     if event.key == K_p:
                         visible.menu_presse()
+                    if event.key == K_b:
+                        visible.m_presse()
+                except AttributeError:
+                    pass
                     
             if event.type == pygame.KEYUP:
                 if event.key == K_UP:
@@ -66,16 +70,18 @@ def gestion_controles():
                     
         else:       #si le joueur utilise la manette
             
-            conf_manette = conf_xbox if gestion_manette_son.manette_xbox else conf_ps
+            conf_manette = CONF_XBOX if gestion_manette_son.manette_xbox else CONF_PS
 
             if event.type == pygame.JOYBUTTONDOWN:
                 if event.button == conf_manette['A']:
                     a_presse = True
-                if isinstance(visible, SessionJeu):
+                try:
                     if event.button == conf_manette['B']:
                         visible.b_presse()
                     if event.button == conf_manette['MENU']:
                         visible.menu_presse()
+                except AttributeError:
+                    pass
 
             if event.type == pygame.JOYBUTTONUP:
                 if event.button == conf_manette['A']:
@@ -117,7 +123,7 @@ screen = pygame.display.set_mode()
 SCREEN_HEIGHT = int(screen.get_height() * TAILLE_FENETRE)
 SCREEN_WIDTH = int(screen.get_width() * TAILLE_FENETRE)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption(nom_du_jeu)
+pygame.display.set_caption(NOM_JEU)
 
 clock = pygame.time.Clock()
 

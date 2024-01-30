@@ -76,7 +76,6 @@ class Vague:
         bonus_aleatoire.rect.midbottom = (x, self.hauteur_min)
         self.bonus_visibles.add(bonus_aleatoire)
 
-
     def placement_ennemi(self):
         """méthode de placement aléatoire des nouveaux ennemis à l'écran
         """
@@ -104,17 +103,15 @@ class Vague:
             if isinstance(ennemi_aleatoire, Gros):
                 ennemi_aleatoire.dep_gauche = x > self.largeur_max // 2
             self.ennemis_visibles.add(ennemi_aleatoire)
-    
+
+    def explosion(self):
+        for e in self.ennemis_visibles:
+            e.touche(e.vie)
            
     def update(self):
         self.tirs_ennemis.update()
         self.ennemis_visibles.update()
         self.bonus_visibles.update()
-        
-        if self.joueur.explosion:
-            for e in self.ennemis_visibles:
-                e.touche(e.vie)
-        self.joueur.explosion = False
         
         if not self.ennemis and not self.ennemis_visibles and not self.bonus_visibles:
             self.finie = True
@@ -127,7 +124,7 @@ class Vague:
                 self.bonus.add(b)
             
             #récupération du bonus par le joueur
-            if b.rect.colliderect(self.joueur) and self.joueur.animation != 3:
+            if b.rect.colliderect(self.joueur) and self.joueur.animation != 3 and not self.joueur.est_mort():
                 self.bonus_visibles.remove(b)
                 self.coordonnees_pop()
                 match b.type:
@@ -185,8 +182,7 @@ class Vague:
             if p.rect.colliderect(self.joueur) and self.joueur.animation ==1:
                 self.joueur.touche(1)
                 self.tirs_ennemis.remove(p)
-        
-        
+       
     def draw(self, surface):
         self.bonus_visibles.draw(surface)
         self.tirs_ennemis.draw(surface)

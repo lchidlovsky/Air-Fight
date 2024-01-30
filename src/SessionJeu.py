@@ -201,9 +201,13 @@ class SessionJeu(pygame.Surface):
     
     def b_presse(self):
         if not self.transition_en_cours:
-            if self.page == 0:
-                self.joueur.explosion_generale()
-                
+            if self.page == 0 and self.joueur.explosion():
+                self.vague.explosion()
+
+    def m_presse(self):
+        if not self.transition_en_cours and self.page == 0:
+            self.joueur.bouclier()
+
     def menu_presse(self):
         if not self.transition_en_cours and self.cooldown == 0:
             self.cooldown = 1
@@ -329,14 +333,13 @@ class SessionJeu(pygame.Surface):
             if self.vague.finie:
                 self.nouvelle_vague()
                 
-        if self.joueur.est_mort() and self.page == 0: self.transition_gameover()
+        if self.page == 0 and self.joueur.disparu(): self.transition_gameover()
     
     def draw(self, surface):
         surface.blit(self, (0, 0))
         
-        #on fait apparaître le joueur et ses tirs
+        if self.page == 0 and not self.joueur.disparu(): self.joueur.draw(surface)
         self.joueur.projectiles.draw(surface)
-        surface.blit(self.joueur.image, self.joueur.rect.topleft)
         
         #on fait apparaître la barre d'informations
         if self.page == -1:

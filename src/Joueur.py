@@ -33,26 +33,29 @@ class Joueur(pygame.sprite.Sprite):
         
         self.vitesse = vitesse_joueur
         self.explosifs = 0
-        self.explosion = False
+        self.boucliers = 0
         self.duplications = 0
     
     def est_mort(self):
-        return self.num_apparence == 6
+        return self.vie < 1
+    
+    def disparu(self):
+        return self.num_apparence == 6 and self.horloge_apparence % 16 == 0
 
     def haut(self):
-        if self.animation != 3 and self.rect.top - self.vitesse >= self.hauteur_min:
+        if self.animation != 4 and self.rect.top - self.vitesse >= self.hauteur_min:
             self.rect.top -= self.vitesse
         
     def bas(self):
-        if self.animation != 3 and self.rect.bottom <= self.hauteur_max:
+        if self.animation != 4 and self.rect.bottom <= self.hauteur_max:
             self.rect.top += self.vitesse
         
     def gauche(self):
-        if self.animation != 3 and self.rect.left - self.vitesse >= self.largeur_min:
+        if self.animation != 4 and self.rect.left - self.vitesse >= self.largeur_min:
             self.rect.left -= self.vitesse
         
     def droite(self):
-        if self.animation != 3 and self.rect.right <= self.largeur_max:
+        if self.animation != 4 and self.rect.right <= self.largeur_max:
             self.rect.left += self.vitesse
             
     def amelioration_puissance_feu(self):
@@ -62,10 +65,29 @@ class Joueur(pygame.sprite.Sprite):
     def amelioration_vitesse(self):
         self.vitesse += 1
     
-    def explosion_generale(self):
+    def explosion(self):
         if self.explosifs and self.vie > 0:
             self.explosifs -= 1
-            self.explosion = True
+            return True
+        return False
+    
+    def bouclier(self):
+        if self.boucliers and self.vie > 0:
+            self.boucliers -= 1
+            self.animation = 3
+
+    def touche(self, degat):
+        if self.animation == 1:
+            self.vie -= degat
+            self.horloge_apparence = 0
+            
+            if self.vie < 1 and self.animation != 4:
+                self.vie = 0
+                self.animation = 4
+                self.num_apparence = 3
+                self.image = self.apparences[3]
+            else:
+                self.animation = 2
 
     def tirer(self):
         if self.cooldown == 0 and self.animation == 1 and self.chargeur > 0:
@@ -91,19 +113,6 @@ class Joueur(pygame.sprite.Sprite):
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +60, self.rect.top +20), vitesse_projectile_joueur, 0))
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +80, self.rect.top +44), vitesse_projectile_joueur, 0))
 
-    def touche(self, degat):
-        if self.animation == 1:
-            self.vie -= degat
-            self.horloge_apparence = 0
-            
-            if self.vie < 1 and self.animation != 3:
-                self.vie = 0
-                self.animation = 3
-                self.num_apparence = 3
-                self.image = self.apparences[3]
-            else:
-                self.animation = 2
-
     def update(self):
         #animation des projectiles tirés
         self.projectiles.update()
@@ -117,7 +126,7 @@ class Joueur(pygame.sprite.Sprite):
                 self.cooldown = 0
 
         match self.animation:
-            case 1:
+            case 1:     #passif
                 self.horloge_apparence += 1
                 
                 if self.horloge_apparence % 40 < 20:
@@ -127,7 +136,7 @@ class Joueur(pygame.sprite.Sprite):
                     self.num_apparence = 2
                     self.image = self.apparences[2]
             
-            case 2:
+            case 2:     #touché
                 self.horloge_apparence += 1
                 
                 if self.horloge_apparence % 10 < 5:
@@ -139,13 +148,19 @@ class Joueur(pygame.sprite.Sprite):
                 if self.horloge_apparence > 100:
                     self.animation = 1
                     self.horloge_apparence = 0
+
+            case 3:     #bouclier
+                pass
             
-            case 3:
+            case 4:     #destruction
                 self.horloge_apparence += 1
                 
-                if self.horloge_apparence % 11 == 0 and self.num_apparence < len(self.apparences)-1:
+                if self.horloge_apparence % 16 == 0 and self.num_apparence < len(self.apparences)-1:
                     self.num_apparence += 1
                     self.image = self.apparences[self.num_apparence]
+                    self.horloge_apparence = 1
     
     def draw(self, surface):
+        surface.blit(self.apparences[self.num_apparence], self.rect.topleft)
+
         self.projectiles.draw(surface)
