@@ -32,9 +32,9 @@ class Joueur(pygame.sprite.Sprite):
         self.cooldown = 0
         
         self.vitesse = vitesse_joueur
-        self.explosifs = 0
+        self.explosifs = 30
         self.boucliers = 0
-        self.duplications = 0
+        self.duplications = 1
     
     def est_mort(self):
         return self.vie < 1
@@ -66,15 +66,16 @@ class Joueur(pygame.sprite.Sprite):
         self.vitesse += 1
     
     def explosion(self):
-        if self.explosifs and self.vie > 0:
+        if self.explosifs and self.animation == 1 and self.vie > 0:
             self.explosifs -= 1
             return True
         return False
     
     def bouclier(self):
-        if self.boucliers and self.vie > 0:
+        if self.boucliers and self.animation == 1 and self.vie > 0:
             self.boucliers -= 1
             self.animation = 3
+            self.horloge_apparence = 0
 
     def touche(self, degat):
         if self.animation == 1:
@@ -99,8 +100,8 @@ class Joueur(pygame.sprite.Sprite):
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +50, self.rect.top +5), vitesse_projectile_joueur, 0))
 
                 case 2:
-                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +16, self.rect.top +44), vitesse_projectile_joueur, 0))
-                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +80, self.rect.top +44), vitesse_projectile_joueur, 0))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +35, self.rect.top +20), vitesse_projectile_joueur, 0))
+                    self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +65, self.rect.top +20), vitesse_projectile_joueur, 0))
 
                 case 3:
                     self.projectiles.add(Projectile(self.image_projectile, (self.rect.left +16, self.rect.top +44), vitesse_projectile_joueur, 0))
@@ -150,7 +151,17 @@ class Joueur(pygame.sprite.Sprite):
                     self.horloge_apparence = 0
 
             case 3:     #bouclier
-                pass
+                self.horloge_apparence += 1
+                
+                if self.horloge_apparence % 6 < 3:
+                    self.num_apparence = 0
+                    self.image = self.apparences[0]
+                else:
+                    self.num_apparence = 1
+                    self.image = self.apparences[1]
+                if self.horloge_apparence > 150:
+                    self.animation = 1
+                    self.horloge_apparence = 0
             
             case 4:     #destruction
                 self.horloge_apparence += 1

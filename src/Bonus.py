@@ -16,6 +16,8 @@ class Bonus(pygame.sprite.Sprite):
                 self.image = pygame.image.load("images/bonus/bonus_munitions.png").convert_alpha()
             case 'explosif':
                 self.image = pygame.image.load("images/bonus/bonus_explosif.png").convert_alpha()
+            case 'bouclier':
+                self.image = pygame.image.load("images/bonus/bonus_bouclier.png").convert_alpha()
 
         self.rect = self.image.get_rect()
         self.rect.midbottom = coord

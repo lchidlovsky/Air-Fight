@@ -10,7 +10,7 @@ class Vague:
     """
     def __init__(self, nom, coord_min, coord_max, joueur, nb_simultanes,
                  nb_petits, nb_moyens, nb_gros,
-                 nb_coeurs, nb_munitions, nb_explosifs, nb_vitesses, nb_feux):
+                 nb_coeurs, nb_munitions, nb_explosifs, nb_boucliers, nb_vitesses, nb_feux):
         self.nom = nom
         self.finie = False
         self.largeur_min = coord_min[0]
@@ -46,6 +46,9 @@ class Vague:
             
         for e in range(nb_explosifs):
             self.bonus.add(Bonus(type='explosif'))
+            
+        for b in range(nb_boucliers):
+            self.bonus.add(Bonus(type='bouclier'))
             
         for v in range(nb_vitesses):
             self.bonus.add(Bonus(type='vitesse'))
@@ -124,7 +127,7 @@ class Vague:
                 self.bonus.add(b)
             
             #récupération du bonus par le joueur
-            if b.rect.colliderect(self.joueur) and self.joueur.animation != 3 and not self.joueur.est_mort():
+            if b.rect.colliderect(self.joueur) and not self.joueur.est_mort():
                 self.bonus_visibles.remove(b)
                 self.coordonnees_pop()
                 match b.type:
@@ -135,6 +138,8 @@ class Vague:
                         self.joueur.chargeur += 10
                     case 'explosif':
                         self.joueur.explosifs += 1
+                    case 'bouclier':
+                        self.joueur.boucliers += 1
                     case 'vitesse':
                         self.joueur.amelioration_vitesse()
                     case 'feu':

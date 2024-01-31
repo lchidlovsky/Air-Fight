@@ -53,6 +53,8 @@ def gestion_controles():
                         visible.menu_presse()
                     if event.key == K_b:
                         visible.m_presse()
+                    if event.key == K_ESCAPE:
+                        visible.menu_presse()
                 except AttributeError:
                     pass
                     
