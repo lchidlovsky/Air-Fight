@@ -1,5 +1,5 @@
 import pygame
-from constantes import *
+from constantes import vie_joueur, vitesse_joueur, vitesse_projectile_joueur, chargeur_joueur
 from Projectile import Projectile
 
 class Joueur(pygame.sprite.Sprite):
@@ -32,9 +32,9 @@ class Joueur(pygame.sprite.Sprite):
         self.cooldown = 0
         
         self.vitesse = vitesse_joueur
-        self.explosifs = 30
+        self.explosifs = 0
         self.boucliers = 0
-        self.duplications = 1
+        self.duplications = 0
     
     def est_mort(self):
         return self.vie < 1

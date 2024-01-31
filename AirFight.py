@@ -48,11 +48,11 @@ def gestion_controles():
                     a_presse = True
                 try:
                     if event.key == K_RETURN:
-                        visible.b_presse()
+                        visible.x_presse()
                     if event.key == K_p:
                         visible.menu_presse()
                     if event.key == K_b:
-                        visible.m_presse()
+                        visible.b_presse()
                     if event.key == K_ESCAPE:
                         visible.menu_presse()
                 except AttributeError:
@@ -80,6 +80,8 @@ def gestion_controles():
                 try:
                     if event.button == conf_manette['B']:
                         visible.b_presse()
+                    if event.button == conf_manette['X']:
+                        visible.x_presse()
                     if event.button == conf_manette['MENU']:
                         visible.menu_presse()
                 except AttributeError:
@@ -88,7 +90,6 @@ def gestion_controles():
             if event.type == pygame.JOYBUTTONUP:
                 if event.button == conf_manette['A']:
                     a_presse = False
-
 
             if event.type == pygame.JOYAXISMOTION:      #gestion du joystick gauche de la manette
                 if manette.get_axis(1) < - 0.3:

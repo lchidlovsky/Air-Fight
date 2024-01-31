@@ -201,12 +201,12 @@ class SessionJeu(pygame.Surface):
                         self.transition_menu_principal()
                         if self.gestion.son_active: MixerAudio.entree()
     
-    def b_presse(self):
+    def x_presse(self):
         if not self.transition_en_cours:
             if self.page == 0 and self.joueur.explosion():
                 self.vague.explosion()
 
-    def m_presse(self):
+    def b_presse(self):
         if not self.transition_en_cours and self.page == 0:
             self.joueur.bouclier()
 
