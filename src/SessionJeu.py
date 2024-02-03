@@ -33,6 +33,7 @@ class SessionJeu(pygame.Surface):
         self.nb_coeurs = 2
         self.nb_munitions = 2
         self.nb_explosifs = 0
+        self.nb_boucliers = 0
         self.nb_feux = 0
         self.nb_vitesses = 0
         self.num_vague = 1
@@ -65,10 +66,10 @@ class SessionJeu(pygame.Surface):
                         joueur=self.joueur, nb_simultanes=self.visibles,
                         nb_petits=self.nb_petits, nb_moyens=self.nb_moyens, nb_gros=self.nb_gros,
                         nb_coeurs=self.nb_coeurs, nb_munitions=self.nb_munitions, nb_explosifs=self.nb_explosifs,
-                        nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
+                        nb_boucliers=self.nb_boucliers, nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
         
         #print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
-        #        self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
+        #        self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_boucliers, 'boucliers  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
         
     def nouvelle_vague(self):
         self.num_vague += 1
@@ -79,6 +80,7 @@ class SessionJeu(pygame.Surface):
         self.nb_coeurs += (1 if not self.num_vague %4 else 0)
         self.nb_munitions += (3 if self.num_vague < 10 else 1)
         self.nb_explosifs = ((1 if not self.num_vague %2 else 0) if self.num_vague < 10 else 1)
+        self.nb_boucliers = int(self.num_vague > 3)
         self.nb_feux = (1 if not (self.num_vague+1) %4 else 0)
         self.nb_vitesses = (1 if not self.num_vague %4 else 0)
         self.vague = Vague("VAGUE N°"+str(self.num_vague),
@@ -86,9 +88,9 @@ class SessionJeu(pygame.Surface):
             joueur=self.joueur, nb_simultanes=self.visibles,
             nb_petits=self.nb_petits, nb_moyens=self.nb_moyens, nb_gros=self.nb_gros,
             nb_coeurs=self.nb_coeurs, nb_munitions=self.nb_munitions, nb_explosifs=self.nb_explosifs,
-            nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
+            nb_boucliers=self.nb_boucliers, nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
         #print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
-        #    self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
+        #    self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_boucliers, 'boucliers  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
      
     def haut(self):
         if not self.transition_en_cours:
@@ -201,9 +203,13 @@ class SessionJeu(pygame.Surface):
     
     def b_presse(self):
         if not self.transition_en_cours:
-            if self.page == 0:
-                self.joueur.explosion_generale()
-                
+            if self.page == 0 and self.joueur.explosion():
+                self.vague.explosion()
+
+    def x_presse(self):
+        if not self.transition_en_cours and self.page == 0:
+            self.joueur.bouclier()
+
     def menu_presse(self):
         if not self.transition_en_cours and self.cooldown == 0:
             self.cooldown = 1
@@ -329,14 +335,14 @@ class SessionJeu(pygame.Surface):
             if self.vague.finie:
                 self.nouvelle_vague()
                 
-        if self.joueur.est_mort() and self.page == 0: self.transition_gameover()
+        if self.page == 0 and self.joueur.disparu(): self.transition_gameover()
     
     def draw(self, surface):
         surface.blit(self, (0, 0))
         
-        #on fait apparaître le joueur et ses tirs
+        if self.page in [0, 1] and not self.joueur.disparu():
+            self.joueur.draw(surface)
         self.joueur.projectiles.draw(surface)
-        surface.blit(self.joueur.image, self.joueur.rect.topleft)
         
         #on fait apparaître la barre d'informations
         if self.page == -1:

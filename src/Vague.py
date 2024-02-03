@@ -10,7 +10,7 @@ class Vague:
     """
     def __init__(self, nom, coord_min, coord_max, joueur, nb_simultanes,
                  nb_petits, nb_moyens, nb_gros,
-                 nb_coeurs, nb_munitions, nb_explosifs, nb_vitesses, nb_feux):
+                 nb_coeurs, nb_munitions, nb_explosifs, nb_boucliers, nb_vitesses, nb_feux):
         self.nom = nom
         self.finie = False
         self.largeur_min = coord_min[0]
@@ -47,6 +47,9 @@ class Vague:
         for e in range(nb_explosifs):
             self.bonus.add(Bonus(type='explosif'))
             
+        for b in range(nb_boucliers):
+            self.bonus.add(Bonus(type='bouclier'))
+            
         for v in range(nb_vitesses):
             self.bonus.add(Bonus(type='vitesse'))
             
@@ -76,7 +79,6 @@ class Vague:
         bonus_aleatoire.rect.midbottom = (x, self.hauteur_min)
         self.bonus_visibles.add(bonus_aleatoire)
 
-
     def placement_ennemi(self):
         """méthode de placement aléatoire des nouveaux ennemis à l'écran
         """
@@ -104,17 +106,15 @@ class Vague:
             if isinstance(ennemi_aleatoire, Gros):
                 ennemi_aleatoire.dep_gauche = x > self.largeur_max // 2
             self.ennemis_visibles.add(ennemi_aleatoire)
-    
+
+    def explosion(self):
+        for e in self.ennemis_visibles:
+            e.touche(e.vie)
            
     def update(self):
         self.tirs_ennemis.update()
         self.ennemis_visibles.update()
         self.bonus_visibles.update()
-        
-        if self.joueur.explosion:
-            for e in self.ennemis_visibles:
-                e.touche(e.vie)
-        self.joueur.explosion = False
         
         if not self.ennemis and not self.ennemis_visibles and not self.bonus_visibles:
             self.finie = True
@@ -127,7 +127,7 @@ class Vague:
                 self.bonus.add(b)
             
             #récupération du bonus par le joueur
-            if b.rect.colliderect(self.joueur) and self.joueur.animation != 3:
+            if b.rect.colliderect(self.joueur) and not self.joueur.est_mort():
                 self.bonus_visibles.remove(b)
                 self.coordonnees_pop()
                 match b.type:
@@ -138,6 +138,8 @@ class Vague:
                         self.joueur.chargeur += 10
                     case 'explosif':
                         self.joueur.explosifs += 1
+                    case 'bouclier':
+                        self.joueur.boucliers += 1
                     case 'vitesse':
                         self.joueur.amelioration_vitesse()
                     case 'feu':
@@ -185,8 +187,7 @@ class Vague:
             if p.rect.colliderect(self.joueur) and self.joueur.animation ==1:
                 self.joueur.touche(1)
                 self.tirs_ennemis.remove(p)
-        
-        
+       
     def draw(self, surface):
         self.bonus_visibles.draw(surface)
         self.tirs_ennemis.draw(surface)

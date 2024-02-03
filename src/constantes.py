@@ -1,4 +1,4 @@
-nom_du_jeu = "Air Fight"
+NOM_JEU = 'Air Fight'
 POLICE = 'comicsans'
 FPS = 60
 TAILLE_FENETRE = 0.88
@@ -24,7 +24,7 @@ vitesse_laser_gros = 20
 
 zone_morte = 0.2
 
-conf_xbox = {'A': 0,
+CONF_XBOX = {'A': 0,
              'B': 1,
              'X': 2,
              'Y': 3,
@@ -35,7 +35,7 @@ conf_xbox = {'A': 0,
              'LB': 4,
              'RB': 5}
 
-conf_ps = {'A': 0,
+CONF_PS = {'A': 0,
            'B': 1,
            'X': 2,
            'Y': 3,

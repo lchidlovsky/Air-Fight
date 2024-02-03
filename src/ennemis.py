@@ -230,4 +230,3 @@ class Gros(Ennemi):
             else:
                 self.num_apparence = 0
                 self.image = self.apparences[0]
-
