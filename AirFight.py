@@ -48,12 +48,10 @@ def gestion_controles():
                     a_presse = True
                 try:
                     if event.key == K_RETURN:
-                        visible.x_presse()
-                    if event.key == K_p:
-                        visible.menu_presse()
-                    if event.key == K_b:
                         visible.b_presse()
-                    if event.key == K_ESCAPE:
+                    if event.key == K_b:
+                        visible.x_presse()
+                    if event.key in [K_p, K_ESCAPE]:
                         visible.menu_presse()
                 except AttributeError:
                     pass

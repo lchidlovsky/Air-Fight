@@ -260,11 +260,17 @@ class MenuAccueil(pygame.Surface):
                              (self.manette_pos[0] + self.manette.get_width() * 0.83, self.manette_pos[1] + self.manette.get_height() * 0.47),
                              (self.manette_pos[0] + self.manette.get_width() + 33, self.manette_pos[1] + a.get_height()//2 + self.manette.get_height() * 0.6), 4)
             
-            surface.blit(pygame.image.load("images/logos/logo_bouclier.png").convert_alpha(),
+            surface.blit(pygame.image.load("images/logos/logo_explosif.png").convert_alpha(),
                          (self.manette_pos[0] + self.manette.get_width() + 58, self.manette_pos[1] + self.manette.get_height() * 0.27))
             pygame.draw.line(surface, 'RED',
                              (self.manette_pos[0] + self.manette.get_width() * 0.90, self.manette_pos[1] + self.manette.get_height() * 0.34),
                              (self.manette_pos[0] + self.manette.get_width() + 48, self.manette_pos[1] + self.manette.get_height() * 0.34), 4)
+            
+            surface.blit(pygame.image.load("images/logos/logo_bouclier.png").convert_alpha(),
+                         (self.manette_pos[0] + self.manette.get_width() * 0.45, self.manette_pos[1] - self.manette.get_height() * 0.16))
+            pygame.draw.line(surface, 'BLUE',
+                             (self.manette_pos[0] + self.manette.get_width() * 0.67, self.manette_pos[1] + self.manette.get_height() * 0.282),
+                             (self.manette_pos[0] + self.manette.get_width() * 0.505, self.manette_pos[1] - self.manette.get_height() * 0), 4)
             
         
         surface.blit(self.ecran_noir, (0, 0))

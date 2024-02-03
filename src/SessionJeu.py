@@ -68,8 +68,8 @@ class SessionJeu(pygame.Surface):
                         nb_coeurs=self.nb_coeurs, nb_munitions=self.nb_munitions, nb_explosifs=self.nb_explosifs,
                         nb_boucliers=self.nb_boucliers, nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
         
-        print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
-                self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_boucliers, 'boucliers  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
+        #print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
+        #        self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_boucliers, 'boucliers  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
         
     def nouvelle_vague(self):
         self.num_vague += 1
@@ -89,8 +89,8 @@ class SessionJeu(pygame.Surface):
             nb_petits=self.nb_petits, nb_moyens=self.nb_moyens, nb_gros=self.nb_gros,
             nb_coeurs=self.nb_coeurs, nb_munitions=self.nb_munitions, nb_explosifs=self.nb_explosifs,
             nb_boucliers=self.nb_boucliers, nb_vitesses=self.nb_vitesses, nb_feux=self.nb_feux)
-        print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
-            self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_boucliers, 'boucliers  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
+        #print("vague n°"+str(self.num_vague), self.visibles, "visibles  ", self.nb_petits, "petits  ", self.nb_moyens, "moyens  ", self.nb_gros, "gros  ",
+        #    self.nb_coeurs, 'coeurs  ', self.nb_munitions, 'munitions  ', self.nb_boucliers, 'boucliers  ', self.nb_explosifs, 'explosifs  ', self.nb_feux, 'feux  ', self.nb_vitesses, 'vitesses')
      
     def haut(self):
         if not self.transition_en_cours:
@@ -201,12 +201,12 @@ class SessionJeu(pygame.Surface):
                         self.transition_menu_principal()
                         if self.gestion.son_active: MixerAudio.entree()
     
-    def x_presse(self):
+    def b_presse(self):
         if not self.transition_en_cours:
             if self.page == 0 and self.joueur.explosion():
                 self.vague.explosion()
 
-    def b_presse(self):
+    def x_presse(self):
         if not self.transition_en_cours and self.page == 0:
             self.joueur.bouclier()
 
@@ -340,7 +340,8 @@ class SessionJeu(pygame.Surface):
     def draw(self, surface):
         surface.blit(self, (0, 0))
         
-        if self.page == 0 and not self.joueur.disparu(): self.joueur.draw(surface)
+        if self.page in [0, 1] and not self.joueur.disparu():
+            self.joueur.draw(surface)
         self.joueur.projectiles.draw(surface)
         
         #on fait apparaître la barre d'informations
