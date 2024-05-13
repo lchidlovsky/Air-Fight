@@ -133,7 +133,7 @@ class Vague:
                 match b.type:
                     case 'coeur':
                         self.joueur.vie +=2
-                        self.joueur.animation = 1
+                        if self.joueur.animation == 2: self.joueur.animation = 1
                     case 'munitions':
                         self.joueur.chargeur += 10
                     case 'explosif':

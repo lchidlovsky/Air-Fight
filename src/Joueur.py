@@ -5,13 +5,13 @@ from Projectile import Projectile
 class Joueur(pygame.sprite.Sprite):
     """classe représentant le vaisseau du joueur
     """
-    def __init__(self, coord, coord_min, coord_max, nb_vie):
+    def __init__(self, coord, coord_min, coord_max):
         pygame.sprite.Sprite.__init__(self)
         self.apparences = []
         for i in range(1,8):
             self.apparences.append(pygame.image.load(f"images/joueur/joueur_{i}.png").convert_alpha())
         
-        self.vie = nb_vie
+        self.vie = vie_joueur
         self.num_apparence = 0
         self.horloge_apparence = 0
         self.animation = 1
@@ -153,13 +153,13 @@ class Joueur(pygame.sprite.Sprite):
             case 3:     #bouclier
                 self.horloge_apparence += 1
                 
-                if self.horloge_apparence % 6 < 3:
+                if self.horloge_apparence % 7 < 3:
                     self.num_apparence = 0
                     self.image = self.apparences[0]
                 else:
                     self.num_apparence = 1
                     self.image = self.apparences[1]
-                if self.horloge_apparence > 150:
+                if self.horloge_apparence > 360:
                     self.animation = 1
                     self.horloge_apparence = 0
             
@@ -175,3 +175,11 @@ class Joueur(pygame.sprite.Sprite):
         surface.blit(self.apparences[self.num_apparence], self.rect.topleft)
 
         self.projectiles.draw(surface)
+        
+        if self.animation == 3:     #cercle du bouclier
+            cote = max(self.rect.width, self.rect.height) * 1.1
+            carre = pygame.Rect(self.rect.centerx - cote//2, self.rect.centery - cote//2, cote, cote)
+            pi_sur_deux = 1.57079632
+            degree_a_radian = 0.01745329
+            deux_pi = 6.28318531
+            pygame.draw.arc(surface, 'BLACK', carre, pi_sur_deux + self.horloge_apparence * degree_a_radian % deux_pi, pi_sur_deux)
